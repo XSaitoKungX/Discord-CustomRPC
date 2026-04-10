@@ -1,0 +1,75 @@
+[data-theme="space"] {
+  --color-bg: #0a0015;
+  --accent-color: #a78bfa;
+
+  --background: 267 100% 4%;
+  --foreground: 260 20% 92%;
+
+  --card: 267 60% 8%;
+  --card-foreground: 260 20% 92%;
+
+  --primary: 263 70% 76%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 267 40% 14%;
+  --secondary-foreground: 260 20% 75%;
+
+  --muted: 267 40% 12%;
+  --muted-foreground: 260 15% 52%;
+
+  --accent: 263 70% 76%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 267 40% 16%;
+  --input: 267 40% 12%;
+  --ring: 263 70% 76%;
+
+  --radius: 0.875rem;
+}
+
+[data-theme="space"] body {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(167, 139, 250, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.06) 0%, transparent 50%);
+}
+
+/* Starfield pseudo-animation via radial gradients */
+[data-theme="space"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 45%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 25%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 65%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 10%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 75%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(2px 2px at 60% 50%, rgba(167,139,250,0.4) 0%, transparent 100%),
+    radial-gradient(2px 2px at 25% 60%, rgba(34,211,238,0.3) 0%, transparent 100%);
+}
+
+[data-theme="space"] #root {
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="space"] .bg-card\/30,
+[data-theme="space"] .bg-card\/40 {
+  background-color: rgba(167, 139, 250, 0.06);
+  backdrop-filter: blur(16px);
+  border-color: rgba(167, 139, 250, 0.15);
+  box-shadow: 0 0 30px rgba(167, 139, 250, 0.05);
+}
+
+[data-theme="space"] .bg-card\/50 {
+  background-color: rgba(167, 139, 250, 0.08);
+}

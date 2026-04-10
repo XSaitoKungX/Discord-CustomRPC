@@ -1,0 +1,49 @@
+[data-theme="light"] {
+  --color-bg: #f5f5f5;
+  --accent-color: #5865F2;
+
+  --background: 0 0% 96%;
+  --foreground: 220 15% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 220 15% 12%;
+
+  --primary: 235 86% 65%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 14% 90%;
+  --secondary-foreground: 220 15% 30%;
+
+  --muted: 220 14% 92%;
+  --muted-foreground: 220 8% 46%;
+
+  --accent: 235 86% 65%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 13% 85%;
+  --input: 220 13% 88%;
+  --ring: 235 86% 65%;
+
+  --radius: 0.75rem;
+}
+
+[data-theme="light"] body {
+  background-color: var(--color-bg);
+}
+
+[data-theme="light"] .bg-card\/30 {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .bg-card\/40 {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .bg-card\/50 {
+  background-color: rgba(255, 255, 255, 0.9);
+}

@@ -1,0 +1,75 @@
+[data-theme="dev"] {
+  --color-bg: #0d0d0d;
+  --accent-color: #00ff41;
+
+  --background: 0 0% 5%;
+  --foreground: 120 100% 75%;
+
+  --card: 0 0% 8%;
+  --card-foreground: 120 100% 75%;
+
+  --primary: 120 100% 50%;
+  --primary-foreground: 0 0% 0%;
+
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 120 80% 60%;
+
+  --muted: 0 0% 11%;
+  --muted-foreground: 120 60% 40%;
+
+  --accent: 120 100% 50%;
+  --accent-foreground: 0 0% 0%;
+
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 0 0% 0%;
+
+  --border: 120 80% 15%;
+  --input: 0 0% 10%;
+  --ring: 120 100% 50%;
+
+  --radius: 0.25rem;
+}
+
+[data-theme="dev"] body {
+  background-color: var(--color-bg);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace !important;
+  color: #00ff41;
+}
+
+[data-theme="dev"] * {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace !important;
+}
+
+/* Scanline overlay */
+[data-theme="dev"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+}
+
+[data-theme="dev"] .bg-card\/30,
+[data-theme="dev"] .bg-card\/40,
+[data-theme="dev"] .bg-card\/50 {
+  background-color: rgba(0, 255, 65, 0.03);
+  border-color: rgba(0, 255, 65, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.05), inset 0 0 0 1px rgba(0, 255, 65, 0.1);
+}
+
+[data-theme="dev"] .border-border {
+  border-color: rgba(0, 255, 65, 0.2);
+}
+
+[data-theme="dev"] .rounded-xl,
+[data-theme="dev"] .rounded-2xl,
+[data-theme="dev"] .rounded-lg {
+  border-radius: 0.25rem;
+}

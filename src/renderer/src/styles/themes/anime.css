@@ -1,0 +1,78 @@
+[data-theme="anime"] {
+  --color-bg: #1a0a2e;
+  --accent-color: #ff6b9d;
+
+  --background: 267 60% 11%;
+  --foreground: 310 30% 94%;
+
+  --card: 267 55% 14%;
+  --card-foreground: 310 30% 94%;
+
+  --primary: 339 100% 71%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 267 50% 20%;
+  --secondary-foreground: 310 20% 78%;
+
+  --muted: 267 50% 18%;
+  --muted-foreground: 310 15% 55%;
+
+  --accent: 339 100% 71%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 267 50% 22%;
+  --input: 267 50% 17%;
+  --ring: 339 100% 71%;
+
+  --radius: 0.875rem;
+}
+
+[data-theme="anime"] body {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse at 30% 10%, rgba(255, 107, 157, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 90%, rgba(0, 242, 254, 0.08) 0%, transparent 50%);
+}
+
+/* Sakura petal animation */
+@keyframes sakura-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+[data-theme="anime"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(3px 5px at 15% 0%, rgba(255,107,157,0.4) 0%, transparent 100%),
+    radial-gradient(3px 5px at 40% 0%, rgba(255,107,157,0.3) 0%, transparent 100%),
+    radial-gradient(3px 5px at 65% 0%, rgba(255,157,218,0.4) 0%, transparent 100%),
+    radial-gradient(3px 5px at 85% 0%, rgba(255,107,157,0.25) 0%, transparent 100%);
+  animation: sakura-fall 12s linear infinite;
+}
+
+[data-theme="anime"] #root {
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="anime"] .bg-card\/30,
+[data-theme="anime"] .bg-card\/40 {
+  background-color: rgba(255, 107, 157, 0.06);
+  backdrop-filter: blur(14px);
+  border-color: rgba(255, 107, 157, 0.2);
+  box-shadow: 0 0 20px rgba(255, 107, 157, 0.08), inset 0 0 0 1px rgba(255, 107, 157, 0.1);
+}
+
+[data-theme="anime"] .bg-card\/50 {
+  background-color: rgba(255, 107, 157, 0.09);
+  border-color: rgba(255, 107, 157, 0.25);
+}

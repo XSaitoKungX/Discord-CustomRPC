@@ -1,0 +1,50 @@
+:root,
+[data-theme="default"] {
+  --color-bg: #0a0a14;
+  --accent-color: #5865F2;
+
+  --background: 237 20% 7%;
+  --foreground: 220 15% 92%;
+
+  --card: 237 20% 10%;
+  --card-foreground: 220 15% 92%;
+
+  --primary: 235 86% 65%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 237 15% 18%;
+  --secondary-foreground: 220 15% 80%;
+
+  --muted: 237 15% 16%;
+  --muted-foreground: 220 10% 55%;
+
+  --accent: 235 86% 65%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 237 15% 18%;
+  --input: 237 15% 15%;
+  --ring: 235 86% 65%;
+
+  --radius: 0.75rem;
+}
+
+[data-theme="default"] body {
+  background-color: var(--color-bg);
+}
+
+[data-theme="default"] .bg-card\/30 {
+  background-color: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="default"] .bg-card\/40 {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="default"] .bg-card\/50 {
+  background-color: rgba(255, 255, 255, 0.06);
+}

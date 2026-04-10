@@ -1,0 +1,42 @@
+[data-theme="dark"] {
+  --color-bg: #0d0d0d;
+  --accent-color: #7289DA;
+
+  --background: 0 0% 5%;
+  --foreground: 220 10% 88%;
+
+  --card: 0 0% 8%;
+  --card-foreground: 220 10% 88%;
+
+  --primary: 227 58% 65%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 13%;
+  --secondary-foreground: 220 10% 70%;
+
+  --muted: 0 0% 12%;
+  --muted-foreground: 220 5% 50%;
+
+  --accent: 227 58% 65%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 0 0% 14%;
+  --input: 0 0% 11%;
+  --ring: 227 58% 65%;
+
+  --radius: 0.625rem;
+}
+
+[data-theme="dark"] body {
+  background-color: var(--color-bg);
+}
+
+[data-theme="dark"] .bg-card\/30,
+[data-theme="dark"] .bg-card\/40,
+[data-theme="dark"] .bg-card\/50 {
+  background-color: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+}
