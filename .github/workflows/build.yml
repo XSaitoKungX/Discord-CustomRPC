@@ -13,15 +13,18 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
       - name: Rebuild native modules
-        run: npm run prepare:native
+        run: bun run prepare:native
       - name: Package Windows
-        run: npm run build:win
+        run: bun run build:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifacts
@@ -36,17 +39,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install system deps
         run: sudo apt-get install -y rpm fakeroot
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
       - name: Rebuild native modules
-        run: npm run prepare:native
+        run: bun run prepare:native
       - name: Package Linux
-        run: npm run build:linux
+        run: bun run build:linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifacts
@@ -62,15 +68,18 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
       - name: Rebuild native modules
-        run: npm run prepare:native
+        run: bun run prepare:native
       - name: Package macOS
-        run: npm run build:mac
+        run: bun run build:mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
