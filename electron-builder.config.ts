@@ -62,10 +62,6 @@ const config: Configuration = {
       { target: 'deb', arch: ['x64', 'arm64'] },
       { target: 'AppImage', arch: ['x64', 'arm64'] }
     ],
-    publish: ['github'],
-    snap: {
-      publish: null
-    },
     icon: 'assets/icon.png',
     category: 'Utility',
     desktop: {
