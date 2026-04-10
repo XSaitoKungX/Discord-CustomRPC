@@ -30,8 +30,9 @@ const config: Configuration = {
   // Rebuild native modules for the target Electron version
   afterPack: async (ctx) => {
     const { execSync } = await import('child_process')
+    const electronVersion = (ctx.packager as unknown as { electronVersion: string }).electronVersion
     execSync(
-      `npx electron-rebuild --version ${ctx.electronVersion} --module-dir ${ctx.appOutDir}/resources/app.asar.unpacked`,
+      `npx electron-rebuild --version ${electronVersion} --module-dir ${ctx.appOutDir}/resources/app.asar.unpacked`,
       { stdio: 'inherit' }
     )
   },
@@ -68,9 +69,9 @@ const config: Configuration = {
     icon: 'assets/icon.png',
     category: 'Utility',
     desktop: {
-      Name: 'Discord Custom RPC Manager',
-      Comment: 'Manage your Discord Rich Presence profiles',
-      StartupNotify: 'true'
+      name: 'Discord Custom RPC Manager',
+      comment: 'Manage your Discord Rich Presence profiles',
+      startupNotify: 'true'
     }
   },
   mac: {

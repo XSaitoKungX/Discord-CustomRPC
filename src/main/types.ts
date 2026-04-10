@@ -21,7 +21,7 @@ export interface RPCProfile {
 
 export type AppTheme = 'default' | 'dark' | 'light' | 'space' | 'anime' | 'kawaii' | 'dev'
 
-export interface AppSettings {
+export interface AppSettings extends Record<string, unknown> {
   theme: AppTheme
   language: 'en'
   minimizeToTray: boolean
