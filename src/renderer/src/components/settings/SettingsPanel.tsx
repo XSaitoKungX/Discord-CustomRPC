@@ -1,5 +1,6 @@
 import { ExternalLink, RefreshCw, Download, RotateCcw, Upload } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { isElectron } from '../../lib/electron'
 import { useSettingsStore } from '../../store/settingsStore'
 import { useRPC } from '../../hooks/useRPC'
 import { ThemeSelector } from './ThemeSelector'
@@ -43,10 +44,11 @@ export function SettingsPanel(): JSX.Element {
 
   const saveSetting = async <K extends keyof AppSettings>(key: K, value: AppSettings[K]): Promise<void> => {
     setSetting(key, value)
-    await window.api.settings.set(key, value)
+    if (isElectron()) await window.api.settings.set(key, value)
   }
 
   const handleExportAll = async (): Promise<void> => {
+    if (!isElectron()) return
     const profiles = await window.api.profiles.getAll()
     const json = JSON.stringify(profiles, null, 2)
     const blob = new Blob([json], { type: 'application/json' })
@@ -84,7 +86,7 @@ export function SettingsPanel(): JSX.Element {
       showOnboarding: true
     }
     for (const [key, value] of Object.entries(defaults) as [keyof AppSettings, AppSettings[keyof AppSettings]][]) {
-      await window.api.settings.set(key, value)
+      if (isElectron()) await window.api.settings.set(key, value)
       setSetting(key, value)
     }
   }

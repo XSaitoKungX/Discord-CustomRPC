@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { GitFork, Globe, Heart, Shield, ExternalLink } from 'lucide-react'
+import { isElectron } from '../lib/electron'
 
 export function About(): JSX.Element {
   const [version, setVersion] = useState<string>('...')
 
   useEffect(() => {
+    if (!isElectron()) return
     window.api.app.version().then(setVersion)
   }, [])
 

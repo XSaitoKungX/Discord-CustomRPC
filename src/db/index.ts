@@ -26,9 +26,15 @@ export function initDatabase(): ReturnType<typeof drizzle<typeof schema>> {
   // Run migrations — packaged build uses resources/, dev uses src/db/migrations/
   const migrationsFolder = app.isPackaged
     ? path.join(process.resourcesPath, 'migrations')
-    : path.join(__dirname, '../../db/migrations')
+    : path.join(app.getAppPath(), 'src/db/migrations')
+
+  if (!fs.existsSync(path.join(migrationsFolder, 'meta', '_journal.json'))) {
+    console.error('[db] Migrations not found at:', migrationsFolder)
+    throw new Error('Database migrations not found. Run: bun run db:generate')
+  }
 
   migrate(db, { migrationsFolder })
+  console.log('[db] Migrations applied successfully')
 
   return db
 }

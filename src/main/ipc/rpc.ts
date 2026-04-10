@@ -24,15 +24,23 @@ async function connectRPC(profile: RPCProfile, win: BrowserWindow | null): Promi
     client = new DiscordRPC.Client({ transport: 'ipc' })
 
     client.on('ready', async () => {
+      console.log('[RPC] Client ready, setting activity')
       broadcastStatus(win, 'connected')
       await setActivity(profile)
     })
 
     client.on('disconnected', () => {
+      console.log('[RPC] Client disconnected')
       broadcastStatus(win, 'disconnected')
       scheduleReconnect(profile, win)
     })
 
+    client.on('error', (err) => {
+      console.error('[RPC] Client error:', err)
+      broadcastStatus(win, 'error')
+    })
+
+    console.log('[RPC] Connecting with clientId:', profile.applicationId)
     await client.login({ clientId: profile.applicationId })
     activeProfile = profile
     return { success: true }

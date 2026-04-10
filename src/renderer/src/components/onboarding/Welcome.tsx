@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Steps } from './Steps'
 import { X } from 'lucide-react'
 import { useSettingsStore } from '../../store/settingsStore'
+import { isElectron } from '../../lib/electron'
 
 interface WelcomeProps {
   onClose: () => void
@@ -13,7 +14,7 @@ export function Welcome({ onClose }: WelcomeProps): JSX.Element {
 
   const handleDontShow = async (): Promise<void> => {
     setSetting('showOnboarding', false)
-    await window.api.settings.set('showOnboarding', false)
+    if (isElectron()) await window.api.settings.set('showOnboarding', false)
     onClose()
   }
 
