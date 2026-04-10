@@ -20,7 +20,7 @@
     "build:full": "npm run db:generate && electron-vite build",
     "preview": "electron-vite preview",
     "build:win": "npm run build:full && electron-builder --win",
-    "build:linux": "npm run build:full && electron-builder --linux",
+    "build:linux": "npm run build:full && electron-builder --linux deb AppImage",
     "build:mac": "npm run build:full && electron-builder --mac",
     "build:all": "npm run build:full && electron-builder --win --linux --mac",
     "release": "npm run build:all -- --publish always",
