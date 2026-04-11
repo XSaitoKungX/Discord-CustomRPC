@@ -14,7 +14,7 @@ interface ProfileCardProps {
   onShare: (profile: RPCProfile) => void
 }
 
-export function ProfileCard({ profile, onEdit, onDelete, onDuplicate, onShare }: ProfileCardProps): JSX.Element {
+export function ProfileCard({ profile, onEdit, onDelete, onDuplicate, onShare }: ProfileCardProps): React.ReactElement {
   const { status, activeProfileId, startRPC, stopRPC } = useRPC()
   const isActive = activeProfileId === profile.id
   const canActivate = status === 'disconnected' || isActive
@@ -51,7 +51,7 @@ export function ProfileCard({ profile, onEdit, onDelete, onDuplicate, onShare }:
       <button
         {...attributes}
         {...listeners}
-        className="flex-shrink-0 p-1 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
+        className="shrink-0 p-1 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
       >
         <GripVertical className="w-4 h-4" />
       </button>
@@ -59,7 +59,7 @@ export function ProfileCard({ profile, onEdit, onDelete, onDuplicate, onShare }:
       {/* Status indicator */}
       <div
         className={cn(
-          'w-2 h-2 rounded-full flex-shrink-0',
+          'w-2 h-2 rounded-full shrink-0',
           isActive && status === 'connected' && 'bg-green-500 shadow-[0_0_6px_#22c55e]',
           isActive && status === 'error' && 'bg-red-500',
           !isActive && 'bg-zinc-600'

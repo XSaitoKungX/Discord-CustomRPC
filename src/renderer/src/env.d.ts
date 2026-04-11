@@ -35,6 +35,9 @@ declare global {
         version: () => Promise<string>
         onReady: (callback: () => void) => () => void
       }
+      discord: {
+        getAssets: (appId: string) => Promise<Array<{ id: string; name: string }>>
+      }
       deeplink: {
         onImport: (callback: (data: string) => void) => () => void
       }

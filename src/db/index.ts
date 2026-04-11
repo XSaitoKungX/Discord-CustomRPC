@@ -30,38 +30,17 @@ export function initDatabase(): ReturnType<typeof drizzle<typeof schema>> {
 
   const journalPath = path.join(migrationsFolder, 'meta', '_journal.json')
 
-  if (fs.existsSync(journalPath)) {
-    migrate(db, { migrationsFolder })
-    console.log('[db] Migrations applied successfully')
-  } else {
-    console.warn('[db] Migrations folder not found at:', migrationsFolder)
-    console.warn('[db] Falling back to inline schema creation')
-    sqlite.exec(`
-      CREATE TABLE IF NOT EXISTS profiles (
-        id TEXT PRIMARY KEY NOT NULL,
-        name TEXT NOT NULL,
-        client_id TEXT NOT NULL,
-        details TEXT,
-        state TEXT,
-        large_image_key TEXT,
-        large_image_text TEXT,
-        small_image_key TEXT,
-        small_image_text TEXT,
-        button1_label TEXT,
-        button1_url TEXT,
-        button2_label TEXT,
-        button2_url TEXT,
-        start_timestamp INTEGER,
-        end_timestamp INTEGER,
-        enable_timestamps INTEGER DEFAULT 0 NOT NULL,
-        party_size INTEGER,
-        party_max INTEGER,
-        created_at INTEGER,
-        updated_at INTEGER
-      );
-    `)
-    console.log('[db] Inline schema created successfully')
+  if (!fs.existsSync(journalPath)) {
+    console.error('[db] Migrations not found at:', migrationsFolder)
+    console.error('[db] App cannot start without database migrations')
+    throw new Error(
+      'Database migrations missing. Please ensure migrations are included in the app bundle.\n' +
+      'Expected path: ' + migrationsFolder
+    )
   }
+
+  migrate(db, { migrationsFolder })
+  console.log('[db] Migrations applied successfully')
 
   return db
 }

@@ -69,6 +69,12 @@ contextBridge.exposeInMainWorld('api', {
     }
   },
 
+  // Discord API helpers (no auth required for public app assets)
+  discord: {
+    getAssets: (appId: string): Promise<Array<{ id: string; name: string }>> =>
+      ipcRenderer.invoke('discord:getAssets', appId)
+  },
+
   // Deep links
   deeplink: {
     onImport: (callback: (data: string) => void): (() => void) => {

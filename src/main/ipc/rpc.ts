@@ -124,6 +124,22 @@ export function getActiveProfile(): RPCProfile | null {
   return activeProfile
 }
 
+export function registerDiscordApiHandlers(): void {
+  ipcMain.handle('discord:getAssets', async (_event, appId: string) => {
+    if (!appId || !/^\d+$/.test(appId)) return []
+    try {
+      const res = await fetch(
+        `https://discord.com/api/v10/oauth2/applications/${appId}/assets`
+      )
+      if (!res.ok) return []
+      const data = await res.json() as Array<{ id: string; name: string; type: number }>
+      return data.map((a) => ({ id: a.id, name: a.name }))
+    } catch {
+      return []
+    }
+  })
+}
+
 export function getRpcStatus(): RPCStatus {
   return currentStatus
 }

@@ -9,7 +9,7 @@ interface RPCControlsProps {
   className?: string
 }
 
-export function RPCControls({ profile, className }: RPCControlsProps): JSX.Element {
+export function RPCControls({ profile, className }: RPCControlsProps): React.ReactElement {
   const { status, activeProfileId, error, startRPC, stopRPC } = useRPC()
 
   const isThisActive = activeProfileId === profile.id

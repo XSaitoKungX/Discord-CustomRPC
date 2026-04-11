@@ -8,7 +8,7 @@ interface RPCStatusProps {
   className?: string
 }
 
-export function RPCStatus({ status, error, className }: RPCStatusProps): JSX.Element {
+export function RPCStatus({ status, error, className }: RPCStatusProps): React.ReactElement {
   const config = {
     connected: {
       icon: Wifi,
@@ -37,7 +37,7 @@ export function RPCStatus({ status, error, className }: RPCStatusProps): JSX.Ele
         className
       )}
     >
-      <Icon className="w-4 h-4 flex-shrink-0" />
+      <Icon className="w-4 h-4 shrink-0" />
       <span className="truncate">{label}</span>
     </div>
   )

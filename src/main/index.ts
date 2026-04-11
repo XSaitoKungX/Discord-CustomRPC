@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { initDatabase } from '../db/index'
 import { registerProfileHandlers } from './ipc/profiles'
-import { registerRpcHandlers } from './ipc/rpc'
+import { registerRpcHandlers, registerDiscordApiHandlers } from './ipc/rpc'
 import { initSettingsStore, registerSettingsHandlers, getSettings } from './ipc/settings'
 import { createTray, updateTrayMenu, destroyTray } from './tray'
 import { setupUpdater } from './updater'
@@ -133,6 +133,7 @@ app.whenReady().then(async () => {
   registerProfileHandlers()
   registerRpcHandlers(getMainWindow)
   registerSettingsHandlers()
+  registerDiscordApiHandlers()
 
   // App version IPC
   ipcMain.handle('app:version', () => app.getVersion())

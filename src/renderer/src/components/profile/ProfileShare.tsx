@@ -8,7 +8,7 @@ interface ProfileShareProps {
   onClose: () => void
 }
 
-export function ProfileShare({ profile, onClose }: ProfileShareProps): JSX.Element {
+export function ProfileShare({ profile, onClose }: ProfileShareProps): React.ReactElement {
   const [copied, setCopied] = useState(false)
   const shareUrl = getShareUrl(profile)
 

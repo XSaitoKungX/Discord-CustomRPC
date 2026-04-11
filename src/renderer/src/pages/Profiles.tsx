@@ -11,7 +11,7 @@ import { isElectron } from '../lib/electron'
 
 type View = 'list' | 'new' | 'edit'
 
-export function Profiles(): JSX.Element {
+export function Profiles(): React.ReactElement {
   const { loadProfiles, deleteProfile, duplicateProfile, reorder, importProfiles } = useProfiles()
   const { profiles } = useProfileStore()
   const [view, setView] = useState<View>('list')
@@ -92,19 +92,23 @@ export function Profiles(): JSX.Element {
   }
 
   return (
-    <div className="p-6 h-full flex flex-col gap-4">
-      <div className="flex items-center gap-3">
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-border shrink-0">
         <button
           onClick={() => setView('list')}
-          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-all"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Profiles
         </button>
-        <h2 className="text-base font-semibold text-foreground">
-          {view === 'new' ? 'New Profile' : `Edit: ${editingProfile?.name}`}
-        </h2>
+        <span className="text-muted-foreground/40">/</span>
+        <span className="text-xs font-medium text-foreground">
+          {view === 'new' ? 'New Profile' : editingProfile?.name}
+        </span>
       </div>
-      <div className="flex-1 overflow-hidden">
+      {/* Editor */}
+      <div className="flex-1 overflow-hidden p-6">
         <ProfileEditor
           profile={editingProfile}
           onSave={handleSaved}

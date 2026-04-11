@@ -11,7 +11,7 @@ const navItems = [
   { icon: Info, label: 'About', path: '/about' }
 ]
 
-export function Sidebar(): JSX.Element {
+export function Sidebar(): React.ReactElement {
   const { sidebarCollapsed, toggleSidebar } = useUiStore()
   const { status } = useRpcStore()
   const navigate = useNavigate()
@@ -26,7 +26,7 @@ export function Sidebar(): JSX.Element {
     >
       {/* Logo */}
       <div className={cn('flex items-center gap-3 px-4 py-5 border-b border-border', sidebarCollapsed && 'justify-center px-2')}>
-        <div className="relative flex-shrink-0">
+        <div className="relative shrink-0">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Activity className="w-4 h-4 text-primary-foreground" />
           </div>
@@ -66,7 +66,7 @@ export function Sidebar(): JSX.Element {
                 sidebarCollapsed && 'justify-center px-2'
               )}
             >
-              <Icon className="w-4 h-4 flex-shrink-0" />
+              <Icon className="w-4 h-4 shrink-0" />
               {!sidebarCollapsed && <span>{label}</span>}
             </button>
           )

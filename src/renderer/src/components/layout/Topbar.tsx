@@ -10,7 +10,7 @@ const pageTitles: Record<string, string> = {
   '/about': 'About'
 }
 
-export function Topbar(): JSX.Element {
+export function Topbar(): React.ReactElement {
   const { status } = useRpcStore()
   const location = useLocation()
   const title = pageTitles[location.pathname] ?? 'Discord Custom RPC'

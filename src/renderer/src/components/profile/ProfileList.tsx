@@ -37,7 +37,7 @@ export function ProfileList({
   onReorder,
   onNew,
   onImport
-}: ProfileListProps): JSX.Element {
+}: ProfileListProps): React.ReactElement {
   const [search, setSearch] = useState('')
 
   const sensors = useSensors(

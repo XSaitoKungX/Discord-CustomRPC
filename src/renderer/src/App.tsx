@@ -11,7 +11,7 @@ import { useTheme } from './hooks/useTheme'
 import { useSettingsStore } from './store/settingsStore'
 import { useUiStore } from './store/uiStore'
 
-function AppShell(): JSX.Element {
+function AppShell(): React.ReactElement {
   useTheme()
   const { settings, loaded } = useSettingsStore()
   const { showOnboarding, setShowOnboarding } = useUiStore()
@@ -42,7 +42,7 @@ const router = createHashRouter([
   }
 ])
 
-export default function App(): JSX.Element {
+export default function App(): React.ReactElement {
   return (
     <>
       <RouterProvider router={router} />

@@ -12,7 +12,7 @@ const themes: { id: AppTheme; label: string; accent: string; bg: string; desc: s
   { id: 'dev', label: 'Dev', accent: '#00ff41', bg: '#0d0d0d', desc: 'Matrix Green' }
 ]
 
-export function ThemeSelector(): JSX.Element {
+export function ThemeSelector(): React.ReactElement {
   const { theme, setTheme } = useTheme()
 
   return (
@@ -35,7 +35,7 @@ export function ThemeSelector(): JSX.Element {
           >
             {/* Color preview */}
             <div
-              className="w-8 h-8 rounded-lg flex-shrink-0 border border-white/10"
+              className="w-8 h-8 rounded-lg shrink-0 border border-white/10"
               style={{ background: t.bg }}
             >
               <div

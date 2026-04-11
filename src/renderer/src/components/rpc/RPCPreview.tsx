@@ -1,15 +1,51 @@
 import { useEffect, useState } from 'react'
-import { ImageIcon } from 'lucide-react'
+import { ImageIcon, AlertCircle } from 'lucide-react'
 import type { RPCProfile } from '../../types/profile'
-import { formatDistanceToNow } from 'date-fns'
+
+interface AssetEntry { id: string; name: string }
 
 interface RPCPreviewProps {
   profile: Partial<RPCProfile>
+  assets?: AssetEntry[]
 }
 
-export function RPCPreview({ profile }: RPCPreviewProps): JSX.Element {
+function getAssetUrl(appId?: string, key?: string, assets?: AssetEntry[]): string | null {
+  if (!appId || !key || !/^\d+$/.test(appId)) return null
+  // Resolve by name → ID if asset list available, else fall back to name (may 404)
+  const byName = assets?.find((a) => a.name === key)
+  const resolvedId = byName?.id ?? key
+  return `https://cdn.discordapp.com/app-assets/${appId}/${resolvedId}.png`
+}
+
+function ImagePlaceholder({ label }: { label: string }): React.ReactElement {
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-1" style={{ background: '#2b2d31' }}>
+      <ImageIcon className="w-6 h-6 text-zinc-600" />
+      <span className="text-[9px] text-zinc-600 text-center px-1 leading-tight">{label}</span>
+    </div>
+  )
+}
+
+function ImageErrorPlaceholder(): React.ReactElement {
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-1" style={{ background: '#2b2d31' }}>
+      <AlertCircle className="w-5 h-5 text-amber-500/70" />
+      <span className="text-[9px] text-amber-500/70 text-center">404</span>
+    </div>
+  )
+}
+
+export function RPCPreview({ profile, assets }: RPCPreviewProps): React.ReactElement {
   const [elapsed, setElapsed] = useState<string>('00:00')
   const [startTime] = useState(() => new Date())
+  const [largeError, setLargeError] = useState(false)
+  const [smallError, setSmallError] = useState(false)
+
+  // Reset errors when profile changes
+  useEffect(() => {
+    setLargeError(false)
+    setSmallError(false)
+  }, [profile.largeImageKey, profile.smallImageKey, profile.applicationId])
 
   useEffect(() => {
     if (!profile.showElapsedTime) return
@@ -27,6 +63,9 @@ export function RPCPreview({ profile }: RPCPreviewProps): JSX.Element {
     return () => clearInterval(interval)
   }, [profile.showElapsedTime, startTime])
 
+  const largeUrl = getAssetUrl(profile.applicationId, profile.largeImageKey, assets)
+  const smallUrl = getAssetUrl(profile.applicationId, profile.smallImageKey, assets)
+
   return (
     // Always dark preview regardless of app theme
     <div className="rounded-xl overflow-hidden" style={{ background: '#1e1f22', fontFamily: 'Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif' }}>
@@ -39,22 +78,23 @@ export function RPCPreview({ profile }: RPCPreviewProps): JSX.Element {
 
       <div className="px-3 pb-3 flex gap-3">
         {/* Large image */}
-        <div className="relative flex-shrink-0">
+        <div className="relative shrink-0">
           <div
             className="w-[72px] h-[72px] rounded-lg flex items-center justify-center overflow-hidden"
             style={{ background: '#313338' }}
           >
-            {profile.largeImageKey ? (
-              <img
-                src={`https://cdn.discordapp.com/app-assets/${profile.applicationId}/${profile.largeImageKey}.png`}
-                alt={profile.largeImageText ?? 'large image'}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  ;(e.target as HTMLImageElement).style.display = 'none'
-                }}
-              />
+            {!largeUrl ? (
+              <ImagePlaceholder label={profile.largeImageKey || 'No image'} />
+            ) : largeError ? (
+              <ImageErrorPlaceholder />
             ) : (
-              <ImageIcon className="w-8 h-8 text-zinc-600" />
+              <img
+                src={largeUrl}
+                alt={profile.largeImageText || 'large image'}
+                className="w-full h-full object-cover"
+                crossOrigin="anonymous"
+                onError={() => setLargeError(true)}
+              />
             )}
           </div>
 
@@ -64,14 +104,19 @@ export function RPCPreview({ profile }: RPCPreviewProps): JSX.Element {
               className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 flex items-center justify-center overflow-hidden"
               style={{ background: '#313338', borderColor: '#1e1f22' }}
             >
-              <img
-                src={`https://cdn.discordapp.com/app-assets/${profile.applicationId}/${profile.smallImageKey}.png`}
-                alt={profile.smallImageText ?? 'small image'}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  ;(e.target as HTMLImageElement).style.display = 'none'
-                }}
-              />
+              {!smallUrl ? (
+                <span className="text-[8px] text-zinc-600">?</span>
+              ) : smallError ? (
+                <AlertCircle className="w-3 h-3 text-amber-500/70" />
+              ) : (
+                <img
+                  src={smallUrl}
+                  alt={profile.smallImageText || 'small image'}
+                  className="w-full h-full object-cover"
+                  crossOrigin="anonymous"
+                  onError={() => setSmallError(true)}
+                />
+              )}
             </div>
           )}
         </div>

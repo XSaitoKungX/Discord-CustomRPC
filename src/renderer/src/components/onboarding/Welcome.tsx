@@ -8,7 +8,7 @@ interface WelcomeProps {
   onClose: () => void
 }
 
-export function Welcome({ onClose }: WelcomeProps): JSX.Element {
+export function Welcome({ onClose }: WelcomeProps): React.ReactElement {
   const [step, setStep] = useState(0)
   const { setSetting } = useSettingsStore()
 
@@ -22,7 +22,7 @@ export function Welcome({ onClose }: WelcomeProps): JSX.Element {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
       <div className="w-[560px] rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="relative px-8 pt-8 pb-6 bg-gradient-to-br from-primary/20 to-transparent">
+        <div className="relative px-8 pt-8 pb-6 bg-linear-to-br from-primary/20 to-transparent">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-all"
