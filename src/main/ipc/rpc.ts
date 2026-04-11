@@ -91,7 +91,13 @@ async function setActivity(profile: RPCProfile): Promise<void> {
 function scheduleReconnect(profile: RPCProfile, win: BrowserWindow | null): void {
   if (reconnectTimer) clearTimeout(reconnectTimer)
   reconnectTimer = setTimeout(() => {
-    connectRPC(profile, win)
+    // Only reconnect if this profile is still the active one (user hasn't manually stopped)
+    if (activeProfile && activeProfile.id === profile.id) {
+      console.log('[RPC] Auto-reconnecting...')
+      connectRPC(profile, win)
+    } else {
+      console.log('[RPC] Reconnect skipped - profile changed or stopped by user')
+    }
   }, 5000)
 }
 

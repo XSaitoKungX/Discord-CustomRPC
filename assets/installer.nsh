@@ -1,46 +1,58 @@
 ; ── Discord Custom RPC Manager – Custom NSIS Script ─────────────────────────
-; Adds: welcome page, running-app check, uninstaller with data-cleanup dialog
+; Based on official electron-builder docs:
+; https://www.electron.build/nsis.html
+;
+; The assisted installer template automatically provides:
+;   - License page        (via nsis.license in electron-builder.config.ts)
+;   - Directory page      (via allowToChangeInstallationDirectory)
+;   - Installation files  (MUI_PAGE_INSTFILES — progress bar)
+;   - Finish page         (with "Launch app" checkbox)
+;
+; We add: Welcome page, running-app check, uninstall data-cleanup dialog
 
-; ── WELCOME PAGE (shown before license + directory) ──────────────────────────
+; ── WELCOME PAGE ─────────────────────────────────────────────────────────────
+; NOTE: Welcome page is NOT added by default — we add it here.
+; Keep the macro body minimal per official docs to avoid symbol conflicts.
 !macro customWelcomePage
-  !define MUI_WELCOMEPAGE_TITLE "Welcome to Discord Custom RPC Manager Setup"
-  !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Discord Custom RPC Manager.$\r$\n$\r$\nIt is recommended that you close all other applications before starting Setup. This will make it possible to update relevant system files without having to reboot your computer.$\r$\n$\r$\nClick Next to continue."
-  !insertmacro MUI_PAGE_WELCOME
+  !insertMacro MUI_PAGE_WELCOME
 !macroend
 
-; ── CHECK IF APP IS ALREADY RUNNING ──────────────────────────────────────────
+; ── INSTALLER INIT: CHECK IF APP IS ALREADY RUNNING ──────────────────────────
 !macro customInit
   FindWindow $0 "" "Discord Custom RPC Manager"
-  StrCmp $0 0 initDone
+  StrCmp $0 0 customInitDone
     MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-      "Discord Custom RPC Manager is currently running.$\n$\nPlease close it before continuing the installation." \
-      IDOK initDone IDCANCEL initQuit
-    initQuit:
+      "Discord Custom RPC Manager is currently running.$\n$\nPlease close it before continuing." \
+      IDOK customInitDone IDCANCEL customInitQuit
+    customInitQuit:
       Quit
-  initDone:
+  customInitDone:
 !macroend
 
 ; ── UNINSTALLER WELCOME PAGE ─────────────────────────────────────────────────
 !macro customUnWelcomePage
   !define MUI_WELCOMEPAGE_TITLE "Uninstall Discord Custom RPC Manager"
-  !define MUI_WELCOMEPAGE_TEXT "This will remove Discord Custom RPC Manager from your computer.$\r$\n$\r$\nClick Next to continue."
+  !define MUI_WELCOMEPAGE_TEXT "This will remove Discord Custom RPC Manager from your computer.$\r$\n$\r$\nYour saved profiles and settings will NOT be deleted unless you choose to remove them in the next step.$\r$\n$\r$\nClick Next to continue."
   !insertmacro MUI_UNPAGE_WELCOME
 !macroend
 
-; ── UNINSTALLER: ASK TO KEEP OR DELETE USER DATA ─────────────────────────────
+; ── UNINSTALLER: DATA CLEANUP DIALOG ─────────────────────────────────────────
+; Runs during the uninstall section (after files are removed)
 !macro customUnInstall
   MessageBox MB_YESNO|MB_ICONQUESTION \
-    "Do you want to delete all saved profiles and settings?$\n$\nYES — Remove all app data (profiles, settings)$\nNO  — Keep your data (safe to reinstall later)" \
-    IDYES unDeleteData IDNO unSkipDelete
+    "Do you also want to delete your saved profiles and settings?$\n$\n\
+YES  →  Permanently delete all profiles and app data$\n\
+NO   →  Keep data (you can reinstall and your profiles will still be there)" \
+    IDYES customUnDeleteData IDNO customUnSkipDelete
 
-  unDeleteData:
+  customUnDeleteData:
     DetailPrint "Removing app data..."
     RMDir /r "$APPDATA\discord-custom-rpc"
     RMDir /r "$LOCALAPPDATA\discord-custom-rpc"
     RMDir /r "$LOCALAPPDATA\Discord Custom RPC Manager"
-    DetailPrint "App data removed."
-    Goto unSkipDelete
+    DetailPrint "App data removed successfully."
+    Goto customUnSkipDelete
 
-  unSkipDelete:
+  customUnSkipDelete:
     DetailPrint "App data kept."
 !macroend

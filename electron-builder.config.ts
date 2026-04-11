@@ -115,9 +115,6 @@ const config: Configuration = {
     // App data cleanup handled by custom script
     deleteAppDataOnUninstall: false,
 
-    // Custom NSIS script for welcome page, running-check, and uninstall dialog
-    include: 'assets/installer.nsh',
-
     // Installer/Uninstaller display name
     installerLanguages: ['English'],
 

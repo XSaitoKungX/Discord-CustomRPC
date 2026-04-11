@@ -6,9 +6,19 @@ let tray: Tray | null = null
 
 function getIconPath(active: boolean): string {
   const iconName = active ? 'tray-active.png' : 'tray-inactive.png'
-  return app.isPackaged
-    ? path.join(process.resourcesPath, 'assets', iconName)
-    : path.join(__dirname, '../../assets', iconName)
+  if (app.isPackaged) {
+    // In packaged app, extraResources are at <app>/resources/assets/
+    return path.join(process.resourcesPath, 'assets', iconName)
+  }
+  // In dev, use source directory
+  return path.join(__dirname, '../../assets', iconName)
+}
+
+function getAppIconPath(): string {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'assets', 'icon.png')
+  }
+  return path.join(__dirname, '../../assets', 'icon.png')
 }
 
 export function createTray(mainWindow: BrowserWindow): Tray {

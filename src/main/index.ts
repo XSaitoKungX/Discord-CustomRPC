@@ -16,9 +16,10 @@ function getMainWindow(): BrowserWindow | null {
 }
 
 function getAppIcon(): Electron.NativeImage {
+  // Use same logic as tray for consistency
   const iconPath = app.isPackaged
     ? join(process.resourcesPath, 'assets', 'icon.png')
-    : join(__dirname, '../../assets/icon.png')
+    : join(__dirname, '../../assets', 'icon.png')
   return nativeImage.createFromPath(iconPath)
 }
 
