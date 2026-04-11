@@ -12,6 +12,13 @@ let currentStatus: UpdateStatus = {
 export function setupUpdater(mainWindow: BrowserWindow): void {
   autoUpdater.autoDownload = false
   autoUpdater.autoInstallOnAppQuit = true
+  
+  // Allow beta/alpha updates if current version is a prerelease
+  const appVersion = require('electron').app.getVersion()
+  if (appVersion.includes('beta') || appVersion.includes('alpha')) {
+    autoUpdater.allowPrerelease = true
+    console.log('[updater] Prerelease updates enabled (beta/alpha)')
+  }
 
   autoUpdater.on('checking-for-update', () => {
     currentStatus = { checking: true, available: false, downloading: false, downloaded: false }
