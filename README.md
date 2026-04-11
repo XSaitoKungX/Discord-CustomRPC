@@ -76,6 +76,27 @@ Alternatively, right-click the `.exe` → **Properties** → Check **"Unblock"**
 
 The app is completely safe — it's open source, you can inspect every line of code in this repository.
 
+### macOS Gatekeeper Warning
+
+> ⚠️ **Important for macOS users**
+
+When opening the `.dmg` or `.app` on macOS, you may see:
+
+> "Discord Custom RPC Manager" can't be opened because Apple cannot check it for malicious software.
+
+### How to open on macOS
+
+1. **Right-click** (or Control+click) the app icon
+2. Select **"Open"** from the context menu
+3. Click **"Open"** in the security dialog
+
+Or use Terminal:
+```bash
+xattr -d com.apple.quarantine /Applications/Discord\ Custom\ RPC\ Manager.app
+```
+
+**Why this happens:** This app is not code-signed ($99/year Apple Developer fee). The app is completely safe — you can inspect all source code in this repository.
+
 ---
 
 ## Building from Source
