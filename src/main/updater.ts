@@ -51,12 +51,15 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
   })
 
   autoUpdater.on('error', (err) => {
+    // Suppress 404 errors (no release published yet) and dev-mode errors
+    const msg = err.message ?? ''
+    const isExpected = msg.includes('404') || msg.includes('net::ERR') || msg.includes('Cannot find latest')
     currentStatus = {
       checking: false,
       available: false,
       downloading: false,
       downloaded: false,
-      error: err.message
+      error: isExpected ? undefined : msg
     }
     mainWindow.webContents.send('updater:status', currentStatus)
   })

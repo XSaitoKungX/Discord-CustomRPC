@@ -78,18 +78,39 @@ const config: Configuration = {
   },
   
   nsis: {
+    // Multi-page installer (not one-click)
     oneClick: false,
     allowToChangeInstallationDirectory: true,
     allowElevation: true,
+
+    // Shortcuts
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
     shortcutName: 'Discord Custom RPC Manager',
-    license: 'LICENSE',
+    menuCategory: 'XSaitoKungX',
+
+    // Icons
     installerIcon: 'assets/icon.ico',
     uninstallerIcon: 'assets/icon.ico',
     installerHeaderIcon: 'assets/icon.ico',
+
+    // License page shown before installation
+    license: 'LICENSE',
+
+    // Launch app after install
+    runAfterFinish: true,
+
+    // App data cleanup handled by custom script
     deleteAppDataOnUninstall: false,
-    runAfterFinish: true
+
+    // Custom NSIS script for welcome page, running-check, and uninstall dialog
+    include: 'assets/installer.nsh',
+
+    // Installer/Uninstaller display name
+    installerLanguages: ['English'],
+
+    // Show Details panel during install
+    displayLanguageSelector: false,
   },
   
   // ─── Linux ─────────────────────────────────────────────────────
@@ -158,7 +179,7 @@ const config: Configuration = {
       { target: 'dmg', arch: ['x64', 'arm64'] },
       { target: 'zip', arch: ['x64', 'arm64'] }
     ],
-    icon: 'assets/icon.icns',
+    icon: 'assets/icon.png',
     hardenedRuntime: false,
     gatekeeperAssess: false,
     identity: null,
@@ -174,7 +195,7 @@ const config: Configuration = {
     ],
     window: { width: 540, height: 380 },
     title: '${productName} ${version}',
-    icon: 'assets/icon.icns',
+    icon: 'assets/icon.png',
     iconSize: 100
   },
   
