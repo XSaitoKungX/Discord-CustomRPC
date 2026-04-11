@@ -28,13 +28,40 @@ export function initDatabase(): ReturnType<typeof drizzle<typeof schema>> {
     ? path.join(process.resourcesPath, 'migrations')
     : path.join(app.getAppPath(), 'src/db/migrations')
 
-  if (!fs.existsSync(path.join(migrationsFolder, 'meta', '_journal.json'))) {
-    console.error('[db] Migrations not found at:', migrationsFolder)
-    throw new Error('Database migrations not found. Run: bun run db:generate')
-  }
+  const journalPath = path.join(migrationsFolder, 'meta', '_journal.json')
 
-  migrate(db, { migrationsFolder })
-  console.log('[db] Migrations applied successfully')
+  if (fs.existsSync(journalPath)) {
+    migrate(db, { migrationsFolder })
+    console.log('[db] Migrations applied successfully')
+  } else {
+    console.warn('[db] Migrations folder not found at:', migrationsFolder)
+    console.warn('[db] Falling back to inline schema creation')
+    sqlite.exec(`
+      CREATE TABLE IF NOT EXISTS profiles (
+        id TEXT PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        client_id TEXT NOT NULL,
+        details TEXT,
+        state TEXT,
+        large_image_key TEXT,
+        large_image_text TEXT,
+        small_image_key TEXT,
+        small_image_text TEXT,
+        button1_label TEXT,
+        button1_url TEXT,
+        button2_label TEXT,
+        button2_url TEXT,
+        start_timestamp INTEGER,
+        end_timestamp INTEGER,
+        enable_timestamps INTEGER DEFAULT 0 NOT NULL,
+        party_size INTEGER,
+        party_max INTEGER,
+        created_at INTEGER,
+        updated_at INTEGER
+      );
+    `)
+    console.log('[db] Inline schema created successfully')
+  }
 
   return db
 }
