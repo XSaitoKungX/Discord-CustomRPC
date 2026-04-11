@@ -109,33 +109,19 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download windows artifacts
+      - uses: actions/checkout@v4
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: windows-artifacts
-          path: artifacts/windows
-      - name: Download linux artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: linux-artifacts
-          path: artifacts/linux
-      - name: Download mac artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: mac-artifacts
-          path: artifacts/mac
+          path: artifacts
+          merge-multiple: true
+      - name: List artifacts
+        run: ls -la artifacts/
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            artifacts/windows/*.exe
-            artifacts/windows/latest.yml
-            artifacts/linux/*.deb
-            artifacts/linux/*.AppImage
-            artifacts/linux/latest-linux.yml
-            artifacts/mac/*.dmg
-            artifacts/mac/latest-mac.yml
-          generate_release_notes: true
-          draft: false
-          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            artifacts/* \
+            --generate-notes \
+            --prerelease=${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
