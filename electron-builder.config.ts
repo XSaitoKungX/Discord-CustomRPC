@@ -159,10 +159,9 @@ const config: Configuration = {
       { target: 'zip', arch: ['x64', 'arm64'] }
     ],
     icon: 'assets/icon.icns',
-    hardenedRuntime: true,
+    hardenedRuntime: false,
     gatekeeperAssess: false,
-    entitlements: 'assets/entitlements.mac.plist',
-    entitlementsInherit: 'assets/entitlements.mac.plist',
+    identity: null,
     artifactName: '${productName}-${version}-${arch}.${ext}',
     category: 'public.app-category.utilities',
     darkModeSupport: true

@@ -34,9 +34,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
-          path: |
-            dist/*.exe
-            dist/*.yml
+          path: dist/*.exe
+          if-no-files-found: warn
 
   build-linux:
     runs-on: ubuntu-latest
@@ -65,7 +64,7 @@ jobs:
           path: |
             dist/*.deb
             dist/*.AppImage
-            dist/*.yml
+          if-no-files-found: warn
 
   build-mac:
     runs-on: macos-latest
@@ -90,25 +89,39 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mac-artifacts
-          path: |
-            dist/*.dmg
-            dist/*.yml
+          path: dist/*.dmg
+          if-no-files-found: warn
 
   release:
     needs: [build-windows, build-linux, build-mac]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Download all artifacts
+      - name: Download windows artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          name: windows-artifacts
+          path: artifacts/windows
+      - name: Download linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-artifacts
+          path: artifacts/linux
+      - name: Download mac artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-artifacts
+          path: artifacts/mac
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
+          files: |
+            artifacts/windows/*.exe
+            artifacts/linux/*.deb
+            artifacts/linux/*.AppImage
+            artifacts/mac/*.dmg
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
