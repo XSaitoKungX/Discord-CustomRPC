@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, globalShortcut } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, globalShortcut, nativeImage } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { initDatabase } from '../db/index'
@@ -15,6 +15,13 @@ function getMainWindow(): BrowserWindow | null {
   return mainWindow
 }
 
+function getAppIcon(): Electron.NativeImage {
+  const iconPath = app.isPackaged
+    ? join(process.resourcesPath, 'assets', 'icon.png')
+    : join(__dirname, '../../assets/icon.png')
+  return nativeImage.createFromPath(iconPath)
+}
+
 function createWindow(): void {
   const settings = getSettings()
 
@@ -25,6 +32,7 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     frame: true,
+    icon: getAppIcon(),
     backgroundColor: '#0a0a14',
     autoHideMenuBar: true,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',

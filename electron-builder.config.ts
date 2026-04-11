@@ -47,6 +47,18 @@ const config: Configuration = {
       to: 'migrations'
     },
     {
+      from: 'assets/icon.png',
+      to: 'assets/icon.png'
+    },
+    {
+      from: 'assets/tray-active.png',
+      to: 'assets/tray-active.png'
+    },
+    {
+      from: 'assets/tray-inactive.png',
+      to: 'assets/tray-inactive.png'
+    },
+    {
       from: 'LICENSE',
       to: 'LICENSE'
     }
