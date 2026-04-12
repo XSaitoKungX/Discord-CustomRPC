@@ -82,12 +82,17 @@ const config: Configuration = {
   },
   
   nsis: {
-    // Multi-page installer (not one-click)
+    // Multi-page assisted installer (NOT one-click!)
     oneClick: false,
     allowToChangeInstallationDirectory: true,
     allowElevation: true,
+    perMachine: false,
 
-    // Include custom NSIS script for Welcome page and checks
+    // Display settings
+    artifactName: '${productName} Setup ${version}.${ext}',
+    uninstallDisplayName: '${productName}',
+
+    // Include custom NSIS script for repair/reinstall detection and uninstall cleanup
     include: 'assets/installer.nsh',
 
     // Shortcuts
@@ -95,12 +100,19 @@ const config: Configuration = {
     createStartMenuShortcut: true,
     shortcutName: 'Discord Custom RPC Manager',
     menuCategory: 'XSaitoKungX',
+
+    // Icons
     installerIcon: 'assets/icon.ico',
     uninstallerIcon: 'assets/icon.ico',
     installerHeaderIcon: 'assets/icon.ico',
+
+    // License page (AGB) - shown before installation
     license: 'LICENSE',
-    // Show "Launch app after install" checkbox on finish page (assisted installer only)
+
+    // Finish page with "Launch app" checkbox
     runAfterFinish: true,
+
+    // Uninstaller settings
     deleteAppDataOnUninstall: false,
     removeDefaultUninstallWelcomePage: true,
   },

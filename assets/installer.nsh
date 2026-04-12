@@ -10,15 +10,32 @@
 ;
 ; We add: Welcome page, running-app check, uninstall data-cleanup dialog
 
-; ── WELCOME PAGE ─────────────────────────────────────────────────────────────
-; NOTE: Welcome page is NOT added by default — we add it here.
-; Keep the macro body minimal per official docs to avoid symbol conflicts.
-!macro customWelcomePage
-  !insertMacro MUI_PAGE_WELCOME
-!macroend
-
-; ── INSTALLER INIT: CHECK IF APP IS ALREADY RUNNING ──────────────────────────
+; ── INSTALLER INIT: CHECK IF APP IS ALREADY INSTALLED / RUNNING ─────────────
 !macro customInit
+  ; Check if app is already installed
+  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_ID}" "DisplayVersion"
+  StrCmp $0 "" checkRunning ; If not installed, skip to running check
+    
+    ; App is installed - ask user what to do
+    MessageBox MB_YESNOCANCEL|MB_ICONQUESTION \
+      "Discord Custom RPC Manager v$0 is already installed.$\n$\nDo you want to:$
+YES    =  Reinstall (keeps your profiles)$\nNO     =  Uninstall first$\nCANCEL =  Cancel installation" \
+      IDYES doReinstall IDNO doUninstall IDCANCEL cancelInstall
+    
+    doReinstall:
+      ; Continue with install (will overwrite)
+      Goto checkRunning
+    
+    doUninstall:
+      ; Launch uninstaller silently
+      ExecWait '"$INSTDIR\Uninstall Discord Custom RPC Manager.exe" /S'
+      Goto checkRunning
+    
+    cancelInstall:
+      Quit
+  
+  checkRunning:
+  ; Check if app is currently running
   FindWindow $0 "" "Discord Custom RPC Manager"
   StrCmp $0 0 customInitDone
     MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
