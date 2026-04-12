@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { createHashRouter, RouterProvider } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { Layout } from './components/layout/Layout'
 import { Home } from './pages/Home'
 import { Profiles } from './pages/Profiles'
@@ -10,17 +11,34 @@ import { Welcome } from './components/onboarding/Welcome'
 import { useTheme } from './hooks/useTheme'
 import { useSettingsStore } from './store/settingsStore'
 import { useUiStore } from './store/uiStore'
+import { useProfiles } from './hooks/useProfiles'
+import { isElectron } from './lib/electron'
 
 function AppShell(): React.ReactElement {
   useTheme()
   const { settings, loaded } = useSettingsStore()
   const { showOnboarding, setShowOnboarding } = useUiStore()
+  const { importProfiles } = useProfiles()
 
   useEffect(() => {
     if (loaded && settings.showOnboarding) {
       setShowOnboarding(true)
     }
   }, [loaded, settings.showOnboarding, setShowOnboarding])
+
+  // Deep link import: discordrpc://import?data=<base64>
+  useEffect(() => {
+    if (!isElectron()) return
+    const unsubscribe = window.api.deeplink.onImport(async (data: string) => {
+      try {
+        const json = atob(data)
+        await importProfiles(json)
+      } catch {
+        toast.error('Failed to import shared profile')
+      }
+    })
+    return unsubscribe
+  }, [importProfiles])
 
   return (
     <>

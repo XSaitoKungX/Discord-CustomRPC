@@ -64,16 +64,13 @@ const config: Configuration = {
     }
   ],
   
-  // ─── Native Module Rebuild ─────────────────────────────────────
-  // Disabled for cross-platform builds - handled by CI per platform
-  // afterPack: async (ctx) => { ... }
-  
   // ─── Release Publishing ────────────────────────────────────────
+  // Publishing is handled by the GitHub Actions release job (gh CLI)
+  // Setting to never prevents electron-builder from creating draft releases during CI builds
   publish: {
     provider: 'github',
     owner: 'XSaitoKungX',
     repo: 'Discord-CustomRPC',
-    releaseType: 'release',
     publishAutoUpdate: true
   },
   
