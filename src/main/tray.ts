@@ -15,10 +15,12 @@ function getIconPath(active: boolean): string {
 }
 
 function getAppIconPath(): string {
+  // Windows needs .ico file for proper icon display
+  const iconFile = process.platform === 'win32' ? 'favicon.ico' : 'icon.png'
   if (app.isPackaged) {
-    return path.join(process.resourcesPath, 'assets', 'icon.png')
+    return path.join(process.resourcesPath, 'assets', iconFile)
   }
-  return path.join(__dirname, '../../assets', 'icon.png')
+  return path.join(__dirname, '../../assets', iconFile)
 }
 
 export function createTray(mainWindow: BrowserWindow): Tray {
