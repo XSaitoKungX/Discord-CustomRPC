@@ -40,8 +40,17 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
     mainWindow.webContents.send('updater:status', currentStatus)
   })
 
-  autoUpdater.on('download-progress', () => {
-    currentStatus = { ...currentStatus, downloading: true }
+  autoUpdater.on('download-progress', (progressObj) => {
+    currentStatus = {
+      ...currentStatus,
+      downloading: true,
+      progress: {
+        percent: Math.round(progressObj.percent),
+        transferred: progressObj.transferred,
+        total: progressObj.total,
+        bytesPerSecond: progressObj.bytesPerSecond
+      }
+    }
     mainWindow.webContents.send('updater:status', currentStatus)
   })
 

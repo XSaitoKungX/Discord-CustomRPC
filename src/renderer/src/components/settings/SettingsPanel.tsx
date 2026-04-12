@@ -184,23 +184,52 @@ export function SettingsPanel(): React.ReactElement {
             </span>
           </div>
 
+          {/* Download progress bar */}
+          {updateStatus.downloading && updateStatus.progress && (
+            <div className="space-y-2">
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300"
+                  style={{ width: `${updateStatus.progress.percent}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{Math.round(updateStatus.progress.percent)}%</span>
+                <span>
+                  {(updateStatus.progress.transferred / 1024 / 1024).toFixed(1)} MB /{' '}
+                  {(updateStatus.progress.total / 1024 / 1024).toFixed(1)} MB
+                  {' · '}
+                  {(updateStatus.progress.bytesPerSecond / 1024 / 1024).toFixed(1)} MB/s
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={checkUpdates}
-              disabled={updateStatus.checking}
+              disabled={updateStatus.checking || updateStatus.downloading}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-all disabled:opacity-50"
             >
               <RefreshCw className={cn('w-3.5 h-3.5', updateStatus.checking && 'animate-spin')} />
               Check for Updates
             </button>
-            {updateStatus.available && !updateStatus.downloaded && (
+            {updateStatus.available && !updateStatus.downloaded && !updateStatus.downloading && (
               <button
                 onClick={downloadUpdate}
-                disabled={updateStatus.downloading}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-all"
               >
                 <Download className="w-3.5 h-3.5" />
-                {updateStatus.downloading ? 'Downloading…' : `Download v${updateStatus.version}`}
+                Download v{updateStatus.version}
+              </button>
+            )}
+            {updateStatus.downloading && (
+              <button
+                disabled
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/50 text-primary-foreground text-xs font-medium cursor-not-allowed"
+              >
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                Downloading…
               </button>
             )}
             {updateStatus.downloaded && (

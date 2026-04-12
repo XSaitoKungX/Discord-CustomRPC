@@ -65,14 +65,9 @@ const config: Configuration = {
   ],
   
   // ─── Release Publishing ────────────────────────────────────────
-  // Publishing is handled by the GitHub Actions release job (gh CLI)
-  // Setting to never prevents electron-builder from creating draft releases during CI builds
-  publish: {
-    provider: 'github',
-    owner: 'XSaitoKungX',
-    repo: 'Discord-CustomRPC',
-    publishAutoUpdate: true
-  },
+  // Publishing: DISABLED - electron-builder will NOT create GitHub releases
+  // The release job in .github/workflows/build.yml creates releases using gh CLI
+  publish: null,
   
   // ─── Windows ───────────────────────────────────────────────────
   win: {
@@ -92,6 +87,9 @@ const config: Configuration = {
     allowToChangeInstallationDirectory: true,
     allowElevation: true,
 
+    // Include custom NSIS script for Welcome page and checks
+    include: 'assets/installer.nsh',
+
     // Shortcuts
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
@@ -101,7 +99,8 @@ const config: Configuration = {
     uninstallerIcon: 'assets/icon.ico',
     installerHeaderIcon: 'assets/icon.ico',
     license: 'LICENSE',
-    runAfterFinish: false,
+    // Show "Launch app after install" checkbox on finish page (assisted installer only)
+    runAfterFinish: true,
     deleteAppDataOnUninstall: false,
     removeDefaultUninstallWelcomePage: true,
   },

@@ -16,11 +16,17 @@ function getMainWindow(): BrowserWindow | null {
 }
 
 function getAppIcon(): Electron.NativeImage {
-  // Use same logic as tray for consistency
+  // Windows needs .ico file for taskbar icon to display properly
+  const iconFile = process.platform === 'win32' ? 'favicon.ico' : 'icon.png'
   const iconPath = app.isPackaged
-    ? join(process.resourcesPath, 'assets', 'icon.png')
-    : join(__dirname, '../../assets', 'icon.png')
-  return nativeImage.createFromPath(iconPath)
+    ? join(process.resourcesPath, 'assets', iconFile)
+    : join(__dirname, '../../assets', iconFile)
+  const image = nativeImage.createFromPath(iconPath)
+  // Windows taskbar icon needs specific sizes
+  if (process.platform === 'win32' && !image.isEmpty()) {
+    return image.resize({ width: 256, height: 256 })
+  }
+  return image
 }
 
 function createWindow(): void {

@@ -12,6 +12,13 @@ export interface UpdateStatus {
   downloaded: boolean
   version?: string
   error?: string
+  // Download progress
+  progress?: {
+    percent: number
+    transferred: number
+    total: number
+    bytesPerSecond: number
+  }
 }
 
 export type AppTheme = 'default' | 'dark' | 'light' | 'space' | 'anime' | 'kawaii' | 'dev'
