@@ -74,7 +74,7 @@ const config: Configuration = {
       { target: 'nsis', arch: ['x64', 'arm64'] },
       { target: 'portable', arch: ['x64'] }
     ],
-    icon: 'assets/icon.ico',
+    icon: 'assets/icon',
     requestedExecutionLevel: 'asInvoker',
     verifyUpdateCodeSignature: false,
     artifactName: '${productName}-${version}-${arch}.${ext}'
@@ -101,9 +101,9 @@ const config: Configuration = {
     menuCategory: 'XSaitoKungX',
 
     // Icons
-    installerIcon: 'assets/icon.ico',
-    uninstallerIcon: 'assets/icon.ico',
-    installerHeaderIcon: 'assets/icon.ico',
+    installerIcon: 'assets/icon',
+    uninstallerIcon: 'assets/icon',
+    installerHeaderIcon: 'assets/icon',
 
     // License page (AGB) - shown before installation
     license: 'LICENSE',
@@ -123,7 +123,7 @@ const config: Configuration = {
       { target: 'AppImage', arch: ['x64', 'arm64'] },
       { target: 'rpm', arch: ['x64', 'arm64'] }
     ],
-    icon: 'assets/icon.png',
+    icon: 'assets/icon',
     category: 'Utility',
     desktop: {
       entry: {
@@ -182,7 +182,7 @@ const config: Configuration = {
       { target: 'dmg', arch: ['x64', 'arm64'] },
       { target: 'zip', arch: ['x64', 'arm64'] }
     ],
-    icon: 'assets/icon.icns',
+    icon: 'assets/icon',
     hardenedRuntime: false,
     gatekeeperAssess: false,
     identity: null,
