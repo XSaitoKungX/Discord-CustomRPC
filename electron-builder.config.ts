@@ -65,9 +65,8 @@ const config: Configuration = {
   ],
   
   // ─── Release Publishing ────────────────────────────────────────
-  // Publishing: DISABLED - electron-builder will NOT create GitHub releases
-  // The release job in .github/workflows/build.yml creates releases using gh CLI
-  publish: null,
+  // Publishing is disabled in CI by NOT setting GH_TOKEN in build jobs
+  // electron-builder will skip publishing when no token is available
   
   // ─── Windows ───────────────────────────────────────────────────
   win: {
