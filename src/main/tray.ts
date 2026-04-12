@@ -22,7 +22,13 @@ function getAppIconPath(): string {
 }
 
 export function createTray(mainWindow: BrowserWindow): Tray {
-  const icon = nativeImage.createFromPath(getIconPath(false))
+  let icon = nativeImage.createFromPath(getIconPath(false))
+  
+  // Windows requires 16x16 tray icons
+  if (process.platform === 'win32' && !icon.isEmpty()) {
+    icon = icon.resize({ width: 16, height: 16 })
+  }
+  
   tray = new Tray(icon)
   tray.setToolTip('Discord Custom RPC Manager')
 
@@ -46,7 +52,14 @@ export function updateTrayMenu(mainWindow: BrowserWindow): void {
   const activeProfile = getActiveProfile()
   const isActive = status === 'connected'
 
-  tray.setImage(nativeImage.createFromPath(getIconPath(isActive)))
+  let icon = nativeImage.createFromPath(getIconPath(isActive))
+  
+  // Windows requires 16x16 tray icons
+  if (process.platform === 'win32' && !icon.isEmpty()) {
+    icon = icon.resize({ width: 16, height: 16 })
+  }
+  
+  tray.setImage(icon)
 
   const contextMenu = Menu.buildFromTemplate([
     {

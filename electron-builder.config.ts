@@ -100,26 +100,13 @@ const config: Configuration = {
     createStartMenuShortcut: true,
     shortcutName: 'Discord Custom RPC Manager',
     menuCategory: 'XSaitoKungX',
-
-    // Icons
     installerIcon: 'assets/icon.ico',
     uninstallerIcon: 'assets/icon.ico',
     installerHeaderIcon: 'assets/icon.ico',
-
-    // License page shown before installation
     license: 'LICENSE',
-
-    // Launch app after install
-    runAfterFinish: true,
-
-    // App data cleanup handled by custom script
+    runAfterFinish: false,
     deleteAppDataOnUninstall: false,
-
-    // Installer/Uninstaller display name
-    installerLanguages: ['English'],
-
-    // Show Details panel during install
-    displayLanguageSelector: false,
+    removeDefaultUninstallWelcomePage: true,
   },
   
   // ─── Linux ─────────────────────────────────────────────────────
@@ -188,7 +175,7 @@ const config: Configuration = {
       { target: 'dmg', arch: ['x64', 'arm64'] },
       { target: 'zip', arch: ['x64', 'arm64'] }
     ],
-    icon: 'assets/icon.png',
+    icon: 'assets/icon.icns',
     hardenedRuntime: false,
     gatekeeperAssess: false,
     identity: null,

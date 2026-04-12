@@ -31,13 +31,25 @@ async function connectRPC(profile: RPCProfile, win: BrowserWindow | null): Promi
 
     client.on('disconnected', () => {
       console.log('[RPC] Client disconnected')
-      broadcastStatus(win, 'disconnected')
-      scheduleReconnect(profile, win)
+      // Only reconnect if the user hasn't manually stopped
+      if (activeProfile && activeProfile.id === profile.id) {
+        broadcastStatus(win, 'disconnected')
+        scheduleReconnect(profile, win)
+      } else {
+        broadcastStatus(win, 'disconnected')
+      }
     })
 
     client.on('error', (err) => {
-      console.error('[RPC] Client error:', err)
-      broadcastStatus(win, 'error')
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn('[RPC] Client error (will reconnect):', msg)
+      // Don't broadcast error status for connection errors — just reconnect silently
+      // Only broadcast error for non-connection issues
+      const isConnectionError = msg.includes('ENOENT') || msg.includes('ECONNREFUSED') || 
+        msg.includes('pipe') || msg.includes('connect')
+      if (!isConnectionError) {
+        broadcastStatus(win, 'error')
+      }
     })
 
     console.log('[RPC] Connecting with clientId:', profile.applicationId)
