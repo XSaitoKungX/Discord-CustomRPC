@@ -111,13 +111,10 @@ jobs:
           merge-multiple: true
       - name: List artifacts
         run: ls -la artifacts/
+      - name: Install git-cliff
+        run: cargo install git-cliff
       - name: Generate Changelog
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --latest --strip header --tag "${{ github.ref_name }}"
-        env:
-          OUTPUT: RELEASE_NOTES.md
+        run: git-cliff --config cliff.toml --latest --strip header --tag "${{ github.ref_name }}" -o RELEASE_NOTES.md
       - name: Read Release Notes
         id: release-notes
         run: |
@@ -135,12 +132,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update CHANGELOG.md
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --tag "${{ github.ref_name }}"
-        env:
-          OUTPUT: CHANGELOG.md
+        run: git-cliff --config cliff.toml --tag "${{ github.ref_name }}" -o CHANGELOG.md
       - name: Commit CHANGELOG.md
         run: |
           git config user.name "github-actions[bot]"
