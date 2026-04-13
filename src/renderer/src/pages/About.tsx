@@ -14,8 +14,8 @@ const LINKS = [
   {
     icon: Globe,
     label: 'Website',
-    description: 'xsaitox.dev/discord-customrpc',
-    href: 'https://xsaitox.dev/discord-customrpc'
+    description: 'xsaitox.dev/en/discord-customrpc',
+    href: 'https://xsaitox.dev/en/discord-customrpc'
   },
   {
     icon: ExternalLink,

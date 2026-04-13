@@ -5,11 +5,11 @@
   "main": "./out/main/index.js",
   "author": {
     "name": "XSaitoKungX",
-    "email": "contact@xsaitox.dev",
-    "url": "https://xsaitox.dev"
+    "email": "mark@xsaitox.dev",
+    "url": "https://xsaitox.dev/en"
   },
   "license": "MIT",
-  "homepage": "https://xsaitox.dev/discord-customrpc",
+  "homepage": "https://xsaitox.dev/en/discord-customrpc",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
@@ -30,7 +30,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "lint": "eslint src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "changelog": "git-cliff --config cliff.toml -o CHANGELOG.md",
+    "changelog:latest": "git-cliff --config cliff.toml --latest --strip header -o RELEASE_NOTES.md"
   },
   "dependencies": {
     "better-sqlite3": "^12.8.0",

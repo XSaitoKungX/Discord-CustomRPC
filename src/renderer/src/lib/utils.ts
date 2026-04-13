@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]): string {
 export function getShareUrl(profile: object): string {
   const json = JSON.stringify(profile)
   const b64 = btoa(unescape(encodeURIComponent(json)))
-  return `https://xsaitox.dev/discord-customrpc/share?data=${b64}`
+  return `https://xsaitox.dev/en/discord-customrpc/share?data=${b64}`
 }
 
 export function decodeShareData(b64: string): object | null {

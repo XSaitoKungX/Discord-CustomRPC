@@ -102,6 +102,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full git history for changelog generation
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
@@ -109,11 +111,40 @@ jobs:
           merge-multiple: true
       - name: List artifacts
         run: ls -la artifacts/
+      - name: Generate Changelog
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --latest --strip header --tag "${{ github.ref_name }}"
+        env:
+          OUTPUT: RELEASE_NOTES.md
+      - name: Read Release Notes
+        id: release-notes
+        run: |
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          cat RELEASE_NOTES.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Create GitHub Release
         run: |
           gh release create "${{ github.ref_name }}" \
             artifacts/* \
-            --generate-notes \
-            --prerelease=${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+            --title "${{ github.ref_name }}" \
+            --notes-file RELEASE_NOTES.md \
+            --draft \
+            --prerelease=${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update CHANGELOG.md
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --tag "${{ github.ref_name }}"
+        env:
+          OUTPUT: CHANGELOG.md
+      - name: Commit CHANGELOG.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore(release): update CHANGELOG.md for ${{ github.ref_name }}" || echo "No changes to commit"
+          git push origin HEAD || echo "Nothing to push"
