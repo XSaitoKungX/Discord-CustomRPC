@@ -51,6 +51,14 @@ const config: Configuration = {
       to: 'assets/icon.png'
     },
     {
+      from: 'assets/favicon.ico',
+      to: 'assets/favicon.ico'
+    },
+    {
+      from: 'assets/icon.ico',
+      to: 'assets/icon.ico'
+    },
+    {
       from: 'assets/tray-active.png',
       to: 'assets/tray-active.png'
     },
@@ -74,7 +82,7 @@ const config: Configuration = {
       { target: 'nsis', arch: ['x64', 'arm64'] },
       { target: 'portable', arch: ['x64'] }
     ],
-    icon: 'assets/favicon.ico',
+    icon: 'assets/icon.ico',
     requestedExecutionLevel: 'asInvoker',
     verifyUpdateCodeSignature: false,
     artifactName: '${productName}-${version}-${arch}.${ext}'
@@ -101,9 +109,9 @@ const config: Configuration = {
     menuCategory: 'XSaitoKungX',
 
     // Icons
-    installerIcon: 'assets/favicon.ico',
-    uninstallerIcon: 'assets/favicon.ico',
-    installerHeaderIcon: 'assets/favicon.ico',
+    installerIcon: 'assets/icon.ico',
+    uninstallerIcon: 'assets/icon.ico',
+    installerHeaderIcon: 'assets/icon.ico',
 
     // License page (AGB) - shown before installation
     license: 'LICENSE',

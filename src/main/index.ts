@@ -17,7 +17,7 @@ function getMainWindow(): BrowserWindow | null {
 
 function getAppIcon(): Electron.NativeImage {
   // Windows: use .ico (multi-size), others: use .png
-  const iconFile = process.platform === 'win32' ? 'favicon.ico' : 'icon.png'
+  const iconFile = process.platform === 'win32' ? 'icon.ico' : 'icon.png'
   const iconPath = app.isPackaged
     ? join(process.resourcesPath, 'assets', iconFile)
     : join(__dirname, '../../assets', iconFile)
