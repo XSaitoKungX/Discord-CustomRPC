@@ -1,11 +1,10 @@
-import type { Configuration } from 'electron-builder'
-
-const config: Configuration = {
+/** @type {import('electron-builder').Configuration} */
+const config = {
   // ─── App Identity ────────────────────────────────────────────────
   appId: 'dev.xsaitox.discord-custom-rpc',
   productName: 'Discord Custom RPC Manager',
   copyright: 'Copyright © 2026 XSaitoKungX (xsaitox.dev)',
-  
+
   // ─── Build Optimization ────────────────────────────────────────
   compression: 'maximum',
   removePackageScripts: true,
@@ -16,13 +15,12 @@ const config: Configuration = {
   // Return false to skip electron-builder's automatic @electron/rebuild
   // Native modules are rebuilt by CI on the correct platform
   beforeBuild: async () => false,
-  
+
   // ─── Directories ────────────────────────────────────────────────
   directories: {
-    output: 'dist',
-    buildResources: 'assets'
+    output: 'dist'
   },
-  
+
   // ─── Files ─────────────────────────────────────────────────────
   files: [
     'out/**/*',
@@ -32,14 +30,14 @@ const config: Configuration = {
     '!**/*.{md,txt,ts,map}',
     '!**/{.git,.github,__tests__,test,tests,spec,specs}/**'
   ],
-  
+
   // ─── Packaging ────────────────────────────────────────────────
   asar: true,
   asarUnpack: [
     'node_modules/better-sqlite3/**/*',
     'node_modules/bindings/**/*'
   ],
-  
+
   // ─── Resources ────────────────────────────────────────────────
   extraResources: [
     {
@@ -63,11 +61,15 @@ const config: Configuration = {
       to: 'LICENSE'
     }
   ],
-  
+
   // ─── Release Publishing ────────────────────────────────────────
-  // Publishing is disabled in CI by NOT setting GH_TOKEN in build jobs
-  // electron-builder will skip publishing when no token is available
-  
+  publish: {
+    provider: 'github',
+    owner: 'XSaitoKungX',
+    repo: 'Discord-CustomRPC',
+    releaseType: 'draft'
+  },
+
   // ─── Windows ───────────────────────────────────────────────────
   win: {
     target: [
@@ -79,43 +81,28 @@ const config: Configuration = {
     verifyUpdateCodeSignature: false,
     artifactName: '${productName}-${version}-${arch}.${ext}'
   },
-  
+
   nsis: {
-    // Multi-page assisted installer (NOT one-click!)
     oneClick: false,
     allowToChangeInstallationDirectory: true,
     allowElevation: true,
     perMachine: false,
-
-    // Display settings
     artifactName: '${productName} Setup ${version}.${ext}',
     uninstallDisplayName: '${productName}',
-
-    // Include custom NSIS script for repair/reinstall detection and uninstall cleanup
     include: 'assets/installer.nsh',
-
-    // Shortcuts
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
     shortcutName: 'Discord Custom RPC Manager',
     menuCategory: 'XSaitoKungX',
-
-    // Icons
     installerIcon: 'assets/icon.ico',
     uninstallerIcon: 'assets/icon.ico',
     installerHeaderIcon: 'assets/icon.ico',
-
-    // License page (AGB) - shown before installation
     license: 'LICENSE',
-
-    // Finish page with "Launch app" checkbox
     runAfterFinish: true,
-
-    // Uninstaller settings
     deleteAppDataOnUninstall: false,
-    removeDefaultUninstallWelcomePage: true,
+    removeDefaultUninstallWelcomePage: true
   },
-  
+
   // ─── Linux ─────────────────────────────────────────────────────
   linux: {
     target: [
@@ -136,7 +123,7 @@ const config: Configuration = {
     },
     artifactName: '${productName}-${version}-${arch}.${ext}'
   },
-  
+
   deb: {
     depends: [
       'libgtk-3-0',
@@ -156,7 +143,7 @@ const config: Configuration = {
     ],
     priority: 'optional'
   },
-  
+
   rpm: {
     depends: [
       'gtk3',
@@ -173,9 +160,9 @@ const config: Configuration = {
       'gbm',
       'libxkbcommon',
       'alsa-lib'
-    ],
+    ]
   },
-  
+
   // ─── macOS ─────────────────────────────────────────────────────
   mac: {
     target: [
@@ -190,7 +177,7 @@ const config: Configuration = {
     category: 'public.app-category.utilities',
     darkModeSupport: true
   },
-  
+
   dmg: {
     contents: [
       { x: 130, y: 220 },
@@ -201,7 +188,7 @@ const config: Configuration = {
     icon: 'assets/icon.png',
     iconSize: 100
   },
-  
+
   // ─── File Associations ─────────────────────────────────────────
   fileAssociations: [
     {
@@ -213,4 +200,4 @@ const config: Configuration = {
   ]
 }
 
-export default config
+module.exports = config

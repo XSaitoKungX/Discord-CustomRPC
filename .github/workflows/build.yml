@@ -26,16 +26,10 @@ jobs:
         run: bun run db:generate
       - name: Rebuild native modules
         run: bun run prepare:native
-      - name: Package Windows
-        run: bun run build:win
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-artifacts
-          path: |
-            dist/*.exe
-            dist/latest.yml
-          if-no-files-found: warn
+      - name: Build & Publish Windows
+        run: bun run release:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-linux:
     runs-on: ubuntu-latest
@@ -58,17 +52,10 @@ jobs:
         run: bun run db:generate
       - name: Rebuild native modules
         run: bun run prepare:native
-      - name: Package Linux
-        run: bun run build:linux
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-artifacts
-          path: |
-            dist/*.deb
-            dist/*.AppImage
-            dist/latest-linux.yml
-          if-no-files-found: warn
+      - name: Build & Publish Linux
+        run: bun run release:linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-mac:
     runs-on: macos-latest
@@ -87,52 +74,28 @@ jobs:
         run: bun run db:generate
       - name: Rebuild native modules
         run: bun run prepare:native
-      - name: Package macOS
-        run: bun run build:mac
+      - name: Build & Publish macOS
+        run: bun run release:mac
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-artifacts
-          path: |
-            dist/*.dmg
-            dist/latest-mac.yml
-          if-no-files-found: warn
 
-  release:
+  changelog:
     needs: [build-windows, build-linux, build-mac]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full git history for changelog generation
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-          merge-multiple: true
-      - name: List artifacts
-        run: ls -la artifacts/
+          fetch-depth: 0
       - name: Install git-cliff
         run: cargo install git-cliff
-      - name: Generate Changelog
+        timeout-minutes: 10
+      - name: Generate release notes
         run: git-cliff --config cliff.toml --latest --strip header --tag "${{ github.ref_name }}" -o RELEASE_NOTES.md
-      - name: Read Release Notes
-        id: release-notes
+      - name: Update release with changelog
         run: |
-          echo "content<<EOF" >> $GITHUB_OUTPUT
-          cat RELEASE_NOTES.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-      - name: Create GitHub Release
-        run: |
-          gh release create "${{ github.ref_name }}" \
-            artifacts/* \
-            --title "${{ github.ref_name }}" \
+          gh release edit "${{ github.ref_name }}" \
             --notes-file RELEASE_NOTES.md \
-            --draft \
             --prerelease=${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
