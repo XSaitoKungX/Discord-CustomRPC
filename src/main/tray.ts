@@ -4,14 +4,11 @@ import { getActiveProfile, getRpcStatus, stopRpc } from './ipc/rpc'
 
 let tray: Tray | null = null
 
-function getIconPath(active: boolean): string {
-  const iconName = active ? 'tray-active.png' : 'tray-inactive.png'
+function getIconPath(_active: boolean): string {
   if (app.isPackaged) {
-    // In packaged app, extraResources are at <app>/resources/assets/
-    return path.join(process.resourcesPath, 'assets', iconName)
+    return path.join(process.resourcesPath, 'assets', 'favicon-16x16.png')
   }
-  // In dev, use source directory
-  return path.join(__dirname, '../../assets', iconName)
+  return path.join(__dirname, '../../assets', 'favicon-16x16.png')
 }
 
 function getAppIconPath(): string {

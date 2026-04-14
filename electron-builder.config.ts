@@ -51,20 +51,12 @@ const config: Configuration = {
       to: 'assets/icon.png'
     },
     {
-      from: 'assets/favicon.ico',
-      to: 'assets/favicon.ico'
-    },
-    {
       from: 'assets/icon.ico',
       to: 'assets/icon.ico'
     },
     {
-      from: 'assets/tray-active.png',
-      to: 'assets/tray-active.png'
-    },
-    {
-      from: 'assets/tray-inactive.png',
-      to: 'assets/tray-inactive.png'
+      from: 'assets/favicon-16x16.png',
+      to: 'assets/favicon-16x16.png'
     },
     {
       from: 'LICENSE',

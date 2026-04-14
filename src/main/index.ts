@@ -1,6 +1,6 @@
 import { app, BrowserWindow, shell, ipcMain, globalShortcut, nativeImage } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { optimizer, is } from '@electron-toolkit/utils'
 import { initDatabase } from '../db/index'
 import { registerProfileHandlers } from './ipc/profiles'
 import { registerRpcHandlers, registerDiscordApiHandlers } from './ipc/rpc'
@@ -8,6 +8,11 @@ import { initSettingsStore, registerSettingsHandlers, getSettings } from './ipc/
 import { createTray, updateTrayMenu, destroyTray } from './tray'
 import { setupUpdater } from './updater'
 import { registerDeepLinkProtocol, handleDeepLink } from './deeplink'
+
+// Must be set before app is ready for Windows taskbar icon to work correctly
+if (process.platform === 'win32') {
+  app.setAppUserModelId('dev.xsaitox.discord-custom-rpc')
+}
 
 let mainWindow: BrowserWindow | null = null
 
@@ -121,8 +126,6 @@ app.whenReady().then(async () => {
     app.quit()
     return
   }
-
-  electronApp.setAppUserModelId('dev.xsaitox.discord-custom-rpc')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
