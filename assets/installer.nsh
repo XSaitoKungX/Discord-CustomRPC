@@ -1,49 +1,40 @@
 ; ── Discord Custom RPC Manager – Custom NSIS Script ─────────────────────────
-; Based on official electron-builder docs:
 ; https://www.electron.build/nsis.html
 ;
-; The assisted installer template automatically provides:
-;   - License page        (via nsis.license in electron-builder.config.ts)
-;   - Directory page      (via allowToChangeInstallationDirectory)
-;   - Installation files  (MUI_PAGE_INSTFILES — progress bar)
-;   - Finish page         (with "Launch app" checkbox)
-;
-; We add: Welcome page, running-app check, uninstall data-cleanup dialog
+; Macros provided by electron-builder (do not redefine):
+;   customInit         – runs before installer pages
+;   customUnWelcomePage – injects a welcome page into the uninstaller
+;   customUnInstall    – runs during uninstall section
 
-; ── INSTALLER INIT: CHECK IF APP IS ALREADY INSTALLED / RUNNING ─────────────
+; ── INSTALLER INIT ───────────────────────────────────────────────────────────
 !macro customInit
-  ; Check if app is already installed
-  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_ID}" "DisplayVersion"
-  StrCmp $0 "" checkRunning ; If not installed, skip to running check
-    
-    ; App is installed - ask user what to do
-    MessageBox MB_YESNOCANCEL|MB_ICONQUESTION \
-      "Discord Custom RPC Manager v$0 is already installed.$\n$\nDo you want to:$
-YES    =  Reinstall (keeps your profiles)$\nNO     =  Uninstall first$\nCANCEL =  Cancel installation" \
-      IDYES doReinstall IDNO doUninstall IDCANCEL cancelInstall
-    
-    doReinstall:
-      ; Continue with install (will overwrite)
-      Goto checkRunning
-    
-    doUninstall:
-      ; Launch uninstaller silently
-      ExecWait '"$INSTDIR\Uninstall Discord Custom RPC Manager.exe" /S'
-      Goto checkRunning
-    
-    cancelInstall:
-      Quit
-  
-  checkRunning:
-  ; Check if app is currently running
-  FindWindow $0 "" "Discord Custom RPC Manager"
-  StrCmp $0 0 customInitDone
+  ; ── Single-instance guard via named mutex ──────────────────────────────────
+  ; More reliable than FindWindow (works even when minimized to tray)
+  System::Call 'kernel32::CreateMutexW(i 0, i 1, w "DiscordCustomRPCManager_Running") i .r0 ?e'
+  Pop $1 ; last error
+  IntCmp $1 183 0 notRunning notRunning ; ERROR_ALREADY_EXISTS = 183
     MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-      "Discord Custom RPC Manager is currently running.$\n$\nPlease close it before continuing." \
-      IDOK customInitDone IDCANCEL customInitQuit
-    customInitQuit:
-      Quit
-  customInitDone:
+      "Discord Custom RPC Manager is currently running.$\r$\n$\r$\nPlease close it before continuing." \
+      IDOK notRunning
+    Quit
+  notRunning:
+
+  ; ── Already-installed check ────────────────────────────────────────────────
+  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_ID}" "DisplayVersion"
+  StrCmp $0 "" initDone
+
+  ; Installed – ask user what to do
+  MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "Discord Custom RPC Manager v$0 is already installed.$\r$\n$\r$\nYES    =  Reinstall / update (keeps your profiles)$\r$\nNO     =  Uninstall first, then install fresh$\r$\nCANCEL =  Abort" IDYES initDone IDNO doUninstall
+  ; CANCEL falls through to Quit
+  Quit
+
+  doUninstall:
+    ; Look up uninstaller path from registry instead of assuming $INSTDIR
+    ReadRegStr $1 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_ID}" "UninstallString"
+    StrCmp $1 "" initDone ; no uninstall string → skip
+    ExecWait '"$1" /S'
+
+  initDone:
 !macroend
 
 ; ── UNINSTALLER WELCOME PAGE ─────────────────────────────────────────────────
@@ -53,23 +44,22 @@ YES    =  Reinstall (keeps your profiles)$\nNO     =  Uninstall first$\nCANCEL =
   !insertmacro MUI_UNPAGE_WELCOME
 !macroend
 
-; ── UNINSTALLER: DATA CLEANUP DIALOG ─────────────────────────────────────────
-; Runs during the uninstall section (after files are removed)
+; ── UNINSTALLER: DATA CLEANUP ────────────────────────────────────────────────
 !macro customUnInstall
-  MessageBox MB_YESNO|MB_ICONQUESTION \
-    "Do you also want to delete your saved profiles and settings?$\n$\n\
-YES  →  Permanently delete all profiles and app data$\n\
-NO   →  Keep data (you can reinstall and your profiles will still be there)" \
-    IDYES customUnDeleteData IDNO customUnSkipDelete
+  MessageBox MB_YESNO|MB_ICONQUESTION "Do you also want to delete your saved profiles and settings?$\r$\n$\r$\nYES  ->  Permanently delete all profiles and app data$\r$\nNO   ->  Keep data (reinstalling will restore your profiles)" IDYES deleteData IDNO skipDelete
 
-  customUnDeleteData:
-    DetailPrint "Removing app data..."
+  deleteData:
+    ; Covers both per-user and per-machine install contexts
+    SetShellVarContext current
+    DetailPrint "Removing user app data..."
     RMDir /r "$APPDATA\discord-custom-rpc"
     RMDir /r "$LOCALAPPDATA\discord-custom-rpc"
     RMDir /r "$LOCALAPPDATA\Discord Custom RPC Manager"
-    DetailPrint "App data removed successfully."
-    Goto customUnSkipDelete
+    DetailPrint "App data removed."
+    Goto uninstallDone
 
-  customUnSkipDelete:
+  skipDelete:
     DetailPrint "App data kept."
+
+  uninstallDone:
 !macroend
