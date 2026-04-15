@@ -49,7 +49,9 @@
 !macro customWelcomePage
   !define MUI_WELCOMEPAGE_TITLE "Welcome to Discord Custom RPC Manager"
   !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Discord Custom RPC Manager.$\r$\n$\r$\nCreate fully custom Discord Rich Presence profiles — set your own title, description, images, buttons, and timestamps.$\r$\n$\r$\nClick Next to continue."
-  !define MUI_WELCOMEFINISHPAGE_BITMAP "${__FILEDIR__}\installer-header.bmp"
+  !ifndef MUI_WELCOMEFINISHPAGE_BITMAP
+    !define MUI_WELCOMEFINISHPAGE_BITMAP "${__FILEDIR__}\installer-header.bmp"
+  !endif
   !insertmacro MUI_PAGE_WELCOME
 !macroend
 
@@ -57,7 +59,9 @@
 !macro customUnWelcomePage
   !define MUI_WELCOMEPAGE_TITLE "Uninstall Discord Custom RPC Manager"
   !define MUI_WELCOMEPAGE_TEXT "This wizard will remove Discord Custom RPC Manager from your computer.$\r$\n$\r$\nYour saved profiles and settings will NOT be deleted unless you choose to remove them in the next step.$\r$\n$\r$\nClick Next to continue."
-  !define MUI_WELCOMEFINISHPAGE_BITMAP "${__FILEDIR__}\installer-header.bmp"
+  !ifndef MUI_WELCOMEFINISHPAGE_BITMAP
+    !define MUI_WELCOMEFINISHPAGE_BITMAP "${__FILEDIR__}\installer-header.bmp"
+  !endif
   !insertmacro MUI_UNPAGE_WELCOME
 !macroend
 
