@@ -54,7 +54,7 @@ jobs:
         run: bun run prepare:native
 
       - name: Build & Publish Windows
-        run: bun run build && electron-builder --win --publish always
+        run: bun run build && npx electron-builder --win --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -108,7 +108,7 @@ jobs:
         run: bun run prepare:native
 
       - name: Build & Publish Linux
-        run: bun run build && electron-builder --linux deb AppImage --publish always
+        run: bun run build && npx electron-builder --linux deb AppImage --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -157,7 +157,7 @@ jobs:
         run: bun run prepare:native
 
       - name: Build & Publish macOS
-        run: bun run build && electron-builder --mac --publish always
+        run: bun run build && npx electron-builder --mac --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
