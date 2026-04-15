@@ -66,9 +66,6 @@
 !macroend
 
 ; ── UNINSTALLER: DATA CLEANUP PAGE ───────────────────────────────────────────
-Var cbDeleteData
-Var cbDeleteDataState
-
 !macro customUnInstall
   ; Custom nsDialogs page — checkbox instead of plain MessageBox
   nsDialogs::Create 1018
@@ -82,16 +79,16 @@ Var cbDeleteDataState
   Pop $1
 
   ${NSD_CreateCheckbox} 0 60u 100% 12u "Delete my profiles and settings permanently"
-  Pop $cbDeleteData
-  ${NSD_SetState} $cbDeleteData ${BST_UNCHECKED}
+  Pop $2
+  ${NSD_SetState} $2 ${BST_UNCHECKED}
 
   ${NSD_CreateLabel} 0 78u 100% 30u "Leave unchecked to keep your data — reinstalling will restore all your profiles."
   Pop $1
 
   nsDialogs::Show
 
-  ${NSD_GetState} $cbDeleteData $cbDeleteDataState
-  StrCmp $cbDeleteDataState ${BST_CHECKED} deleteData skipDelete
+  ${NSD_GetState} $2 $3
+  StrCmp $3 ${BST_CHECKED} deleteData skipDelete
 
   deleteData:
     SetShellVarContext current
