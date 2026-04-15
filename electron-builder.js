@@ -57,6 +57,14 @@ const config = {
       to: 'assets/favicon-16x16.png'
     },
     {
+      from: 'assets/installer-banner.bmp',
+      to: 'assets/installer-banner.bmp'
+    },
+    {
+      from: 'assets/installer-header.bmp',
+      to: 'assets/installer-header.bmp'
+    },
+    {
       from: 'LICENSE',
       to: 'LICENSE'
     }
