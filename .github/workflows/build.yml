@@ -12,32 +12,32 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version: latest
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6.3.0
         with:
           node-version: 24
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: node_modules
           key: windows-node_modules-${{ hashFiles('bun.lockb') }}
           restore-keys: windows-node_modules-
 
       - name: Cache Electron
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: ~\AppData\Local\electron\Cache
           key: windows-electron-${{ hashFiles('package.json') }}
           restore-keys: windows-electron-
 
       - name: Cache electron-builder
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: ~\AppData\Local\electron-builder\Cache
           key: windows-electron-builder-${{ hashFiles('package.json') }}
@@ -53,40 +53,48 @@ jobs:
       - name: Rebuild native modules
         run: bun run prepare:native
 
-      - name: Build & Publish Windows
-        run: bun run build && npx electron-builder --win --publish always
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package Windows
+        run: bun run build:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: windows-artifacts
+          path: |
+            dist/*.exe
+            dist/*.blockmap
+            dist/latest.yml
+          if-no-files-found: warn
 
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version: latest
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6.3.0
         with:
           node-version: 24
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: node_modules
           key: linux-node_modules-${{ hashFiles('bun.lockb') }}
           restore-keys: linux-node_modules-
 
       - name: Cache Electron
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: ~/.cache/electron
           key: linux-electron-${{ hashFiles('package.json') }}
           restore-keys: linux-electron-
 
       - name: Cache electron-builder
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: ~/.cache/electron-builder
           key: linux-electron-builder-${{ hashFiles('package.json') }}
@@ -107,40 +115,49 @@ jobs:
       - name: Rebuild native modules
         run: bun run prepare:native
 
-      - name: Build & Publish Linux
-        run: bun run build && npx electron-builder --linux deb AppImage --publish always
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package Linux
+        run: bun run build:linux
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: linux-artifacts
+          path: |
+            dist/*.deb
+            dist/*.AppImage
+            dist/*.blockmap
+            dist/latest-linux.yml
+          if-no-files-found: warn
 
   build-mac:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version: latest
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6.3.0
         with:
           node-version: 24
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: node_modules
           key: macos-node_modules-${{ hashFiles('bun.lockb') }}
           restore-keys: macos-node_modules-
 
       - name: Cache Electron
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: ~/Library/Caches/electron
           key: macos-electron-${{ hashFiles('package.json') }}
           restore-keys: macos-electron-
 
       - name: Cache electron-builder
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: ~/Library/Caches/electron-builder
           key: macos-electron-builder-${{ hashFiles('package.json') }}
@@ -156,19 +173,38 @@ jobs:
       - name: Rebuild native modules
         run: bun run prepare:native
 
-      - name: Build & Publish macOS
-        run: bun run build && npx electron-builder --mac --publish always
+      - name: Package macOS
+        run: bun run build:mac
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-  changelog:
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: mac-artifacts
+          path: |
+            dist/*.dmg
+            dist/*.zip
+            dist/*.blockmap
+            dist/latest-mac.yml
+          if-no-files-found: warn
+
+  release:
     needs: [build-windows, build-linux, build-mac]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -la artifacts/
 
       - name: Install git-cliff
         uses: kenji-miyake/setup-git-cliff@v2
@@ -176,10 +212,13 @@ jobs:
       - name: Generate release notes
         run: git-cliff --config cliff.toml --latest --strip header --tag "${{ github.ref_name }}" -o RELEASE_NOTES.md
 
-      - name: Update release with changelog
+      - name: Create GitHub Release
         run: |
-          gh release edit "${{ github.ref_name }}" \
+          gh release create "${{ github.ref_name }}" \
+            artifacts/* \
+            --title "${{ github.ref_name }}" \
             --notes-file RELEASE_NOTES.md \
+            --draft \
             --prerelease=${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
