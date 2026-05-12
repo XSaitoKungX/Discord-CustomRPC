@@ -1,6 +1,6 @@
 {
   "name": "discord-custom-rpc",
-  "version": "1.0.1-beta.2",
+  "version": "2.0.0-beta.1",
   "description": "A fully-featured Discord Custom RPC Manager — open source, free for everyone.",
   "main": "./out/main/index.js",
   "author": {
@@ -16,18 +16,18 @@
     "url": "https://github.com/XSaitoKungX/Discord-CustomRPC"
   },
   "scripts": {
-    "dev": "npx @electron/rebuild -f -w better-sqlite3 --silent && electron-vite dev",
+    "dev": "npx @electron/rebuild -f -w better-sqlite3 && electron-vite dev",
     "build": "electron-vite build",
     "build:full": "bun run db:generate && electron-vite build",
     "preview": "electron-vite preview",
     "build:win": "bun run build:full && electron-builder --win --publish never",
-    "build:linux": "bun run build:full && electron-builder --linux deb AppImage --publish never",
+    "build:linux": "bun run build:full && electron-builder --linux deb AppImage rpm --publish never",
     "build:mac": "bun run build:full && electron-builder --mac --publish never",
     "build:all": "bun run build:full && electron-builder --win --linux --mac --publish never",
     "release:win": "bun run build:full && electron-builder --win --publish always",
-    "release:linux": "bun run build:full && electron-builder --linux deb AppImage --publish always",
+    "release:linux": "bun run build:full && electron-builder --linux deb AppImage rpm --publish always",
     "release:mac": "bun run build:full && electron-builder --mac --publish always",
-    "prepare:native": "electron-rebuild -f -w better-sqlite3",
+    "prepare:native": "npx @electron/rebuild -f -w better-sqlite3",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

@@ -1,6 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import DiscordRPC from 'discord-rpc'
 import type { RPCProfile, RPCStatus, RPCStartResult } from '../types'
+import { ActivityType, TimestampMode } from '../types'
 
 let client: DiscordRPC.Client | null = null
 let currentStatus: RPCStatus = 'disconnected'
@@ -66,10 +67,20 @@ async function connectRPC(profile: RPCProfile, win: BrowserWindow | null): Promi
 async function setActivity(profile: RPCProfile): Promise<void> {
   if (!client) return
 
-  const activity: DiscordRPC.Presence = {}
+  const activity: DiscordRPC.Presence & { type?: number; url?: string } = {}
+
+  // Activity type
+  activity.type = profile.activityType ?? ActivityType.PLAYING
+
+  // Stream URL (only relevant for STREAMING type)
+  if (profile.activityType === ActivityType.STREAMING && profile.streamUrl) {
+    activity.url = profile.streamUrl
+  }
 
   if (profile.details) activity.details = profile.details
   if (profile.state) activity.state = profile.state
+
+  // Images
   if (profile.largeImageKey) {
     activity.largeImageKey = profile.largeImageKey
     if (profile.largeImageText) activity.largeImageText = profile.largeImageText
@@ -78,11 +89,27 @@ async function setActivity(profile: RPCProfile): Promise<void> {
     activity.smallImageKey = profile.smallImageKey
     if (profile.smallImageText) activity.smallImageText = profile.smallImageText
   }
-  if (profile.showElapsedTime) {
+
+  // Timestamps
+  const mode = profile.timestampMode ?? TimestampMode.NONE
+  if (mode === TimestampMode.NOW) {
+    startTimestamp = startTimestamp ?? new Date()
+    activity.startTimestamp = startTimestamp
+  } else if (mode === TimestampMode.LOCAL_TIME) {
+    const now = new Date()
+    const midnight = new Date(now)
+    midnight.setHours(0, 0, 0, 0)
+    activity.startTimestamp = midnight
+  } else if (mode === TimestampMode.CUSTOM) {
+    if (profile.startTimestamp) activity.startTimestamp = new Date(profile.startTimestamp)
+    if (profile.endTimestamp) activity.endTimestamp = new Date(profile.endTimestamp)
+  } else if (profile.showElapsedTime) {
+    // Legacy fallback: showElapsedTime toggle
     startTimestamp = startTimestamp ?? new Date()
     activity.startTimestamp = startTimestamp
   }
 
+  // Buttons
   const buttons: { label: string; url: string }[] = []
   if (profile.button1Label && profile.button1Url) {
     buttons.push({ label: profile.button1Label, url: profile.button1Url })
@@ -92,6 +119,7 @@ async function setActivity(profile: RPCProfile): Promise<void> {
   }
   if (buttons.length > 0) activity.buttons = buttons
 
+  // Party
   if (profile.partySize !== undefined && profile.partyMax !== undefined) {
     activity.partySize = profile.partySize
     activity.partyMax = profile.partyMax

@@ -12,9 +12,6 @@ const config = {
   npmRebuild: false,
   nodeGypRebuild: false,
   buildDependenciesFromSource: false,
-  // Return false to skip electron-builder's automatic @electron/rebuild
-  // Native modules are rebuilt by CI on the correct platform
-  beforeBuild: async () => false,
 
   // ─── Directories ────────────────────────────────────────────────
   directories: {
@@ -107,8 +104,7 @@ const config = {
     installerHeaderIcon: 'assets/icon.ico',
     license: 'LICENSE',
     runAfterFinish: true,
-    deleteAppDataOnUninstall: false,
-    removeDefaultUninstallWelcomePage: true
+    deleteAppDataOnUninstall: false
   },
 
   // ─── Linux ─────────────────────────────────────────────────────
@@ -178,8 +174,10 @@ const config = {
       { target: 'zip', arch: ['x64', 'arm64'] }
     ],
     icon: 'assets/icon.icns',
-    hardenedRuntime: false,
+    hardenedRuntime: true,
     gatekeeperAssess: false,
+    entitlements: 'assets/entitlements.mac.plist',
+    entitlementsInherit: 'assets/entitlements.mac.plist',
     identity: null,
     artifactName: '${productName}-${version}-${arch}.${ext}',
     category: 'public.app-category.utilities',
@@ -193,7 +191,7 @@ const config = {
     ],
     window: { width: 540, height: 380 },
     title: '${productName} ${version}',
-    icon: 'assets/icon.png',
+    icon: 'assets/icon.icns',
     iconSize: 100
   },
 

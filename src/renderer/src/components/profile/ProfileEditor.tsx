@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
-import { Save, X, Type, ImageIcon, MousePointerClick, Users, ExternalLink, Info, Loader2, ChevronDown } from 'lucide-react'
+import { Save, X, Type, ImageIcon, MousePointerClick, Users, ExternalLink, Info, Loader2, ChevronDown, Clock } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useProfiles } from '../../hooks/useProfiles'
 import { isElectron } from '../../lib/electron'
 import { RPCPreview } from '../rpc/RPCPreview'
 import type { RPCProfile, CreateProfileData } from '../../types/profile'
+import { ActivityType, TimestampMode } from '../../types/profile'
 
 interface ProfileEditorProps {
   profile?: RPCProfile
@@ -12,21 +13,45 @@ interface ProfileEditorProps {
   onCancel?: () => void
 }
 
+const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
+  [ActivityType.PLAYING]: 'Playing',
+  [ActivityType.STREAMING]: 'Streaming',
+  [ActivityType.LISTENING]: 'Listening',
+  [ActivityType.WATCHING]: 'Watching',
+  [ActivityType.COMPETING]: 'Competing'
+}
+
+const TIMESTAMP_MODE_LABELS: Record<TimestampMode, string> = {
+  [TimestampMode.NONE]: 'None',
+  [TimestampMode.NOW]: 'Since app connected',
+  [TimestampMode.LOCAL_TIME]: 'Since midnight (local time)',
+  [TimestampMode.CUSTOM]: 'Custom start / end'
+}
+
 const emptyForm: CreateProfileData = {
   name: '',
   applicationId: '',
+  activityType: ActivityType.PLAYING,
   details: '',
+  detailsUrl: '',
   state: '',
+  stateUrl: '',
+  streamUrl: '',
   largeImageKey: '',
   largeImageText: '',
+  largeImageUrl: '',
   smallImageKey: '',
   smallImageText: '',
+  smallImageUrl: '',
   button1Label: '',
   button1Url: '',
   button2Label: '',
   button2Url: '',
   partySize: undefined,
   partyMax: undefined,
+  timestampMode: TimestampMode.NONE,
+  startTimestamp: undefined,
+  endTimestamp: undefined,
   showElapsedTime: false
 }
 
@@ -227,18 +252,27 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
     profile ? {
       name: profile.name,
       applicationId: profile.applicationId,
+      activityType: profile.activityType ?? ActivityType.PLAYING,
       details: profile.details ?? '',
+      detailsUrl: profile.detailsUrl ?? '',
       state: profile.state ?? '',
+      stateUrl: profile.stateUrl ?? '',
+      streamUrl: profile.streamUrl ?? '',
       largeImageKey: profile.largeImageKey ?? '',
       largeImageText: profile.largeImageText ?? '',
+      largeImageUrl: profile.largeImageUrl ?? '',
       smallImageKey: profile.smallImageKey ?? '',
       smallImageText: profile.smallImageText ?? '',
+      smallImageUrl: profile.smallImageUrl ?? '',
       button1Label: profile.button1Label ?? '',
       button1Url: profile.button1Url ?? '',
       button2Label: profile.button2Label ?? '',
       button2Url: profile.button2Url ?? '',
       partySize: profile.partySize,
       partyMax: profile.partyMax,
+      timestampMode: profile.timestampMode ?? TimestampMode.NONE,
+      startTimestamp: profile.startTimestamp,
+      endTimestamp: profile.endTimestamp,
       showElapsedTime: profile.showElapsedTime
     } : emptyForm
   )
@@ -362,6 +396,41 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                     )
                   }
                 </div>
+
+                {/* Activity Type */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Activity Type</label>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {(Object.values(ActivityType).filter(v => typeof v === 'number') as ActivityType[]).map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => set('activityType', type)}
+                        className={cn(
+                          'py-1.5 px-2 rounded-lg text-xs font-medium border transition-all',
+                          form.activityType === type
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent/10'
+                        )}
+                      >
+                        {ACTIVITY_TYPE_LABELS[type]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stream Link (only when STREAMING) */}
+                {form.activityType === ActivityType.STREAMING && (
+                  <Field
+                    label="Stream Link"
+                    id="streamUrl"
+                    value={form.streamUrl ?? ''}
+                    onChange={(v) => set('streamUrl', v)}
+                    placeholder="https://twitch.tv/yourchannel"
+                    hint="Twitch or YouTube URL"
+                    mono
+                  />
+                )}
               </div>
 
               <div className="rounded-xl border border-border bg-card/30 p-4 space-y-4">
@@ -375,12 +444,28 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                   hint="First line shown under your name"
                 />
                 <Field
+                  label="Details URL (clickable link)"
+                  id="detailsUrl"
+                  value={form.detailsUrl ?? ''}
+                  onChange={(v) => set('detailsUrl', v)}
+                  placeholder="https://example.com"
+                  mono
+                />
+                <Field
                   label="State"
                   id="state"
                   value={form.state ?? ''}
                   onChange={(v) => set('state', v)}
                   placeholder="In a match"
                   hint="Second line shown under details"
+                />
+                <Field
+                  label="State URL (clickable link)"
+                  id="stateUrl"
+                  value={form.stateUrl ?? ''}
+                  onChange={(v) => set('stateUrl', v)}
+                  placeholder="https://example.com"
+                  mono
                 />
               </div>
             </div>
@@ -407,6 +492,7 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                   appId={form.applicationId}
                 />
                 <Field label="Tooltip" id="largeText" value={form.largeImageText ?? ''} onChange={(v) => set('largeImageText', v)} placeholder="Main game logo" />
+                <Field label="Clickable URL" id="largeUrl" value={form.largeImageUrl ?? ''} onChange={(v) => set('largeImageUrl', v)} placeholder="https://example.com" mono />
               </div>
               <div className="border-t border-border/50 pt-4 space-y-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Small Image</p>
@@ -420,6 +506,7 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                   appId={form.applicationId}
                 />
                 <Field label="Tooltip" id="smallText" value={form.smallImageText ?? ''} onChange={(v) => set('smallImageText', v)} placeholder="Online" />
+                <Field label="Clickable URL" id="smallUrl" value={form.smallImageUrl ?? ''} onChange={(v) => set('smallImageUrl', v)} placeholder="https://example.com" mono />
               </div>
             </div>
           )}
@@ -441,8 +528,62 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
 
           {tab === 'extra' && (
             <div className="space-y-4">
+
+              {/* Timestamp */}
               <div className="rounded-xl border border-border bg-card/30 p-4 space-y-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Party</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><Clock className="w-3 h-3" /> Timestamp</p>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Mode</label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {(Object.values(TimestampMode).filter(v => typeof v === 'number') as TimestampMode[]).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => set('timestampMode', mode)}
+                        className={cn(
+                          'py-1.5 px-2 rounded-lg text-xs font-medium border transition-all text-left',
+                          form.timestampMode === mode
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent/10'
+                        )}
+                      >
+                        {TIMESTAMP_MODE_LABELS[mode]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {form.timestampMode === TimestampMode.CUSTOM && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="startTs" className="text-xs font-medium text-muted-foreground">Start (Unix ms)</label>
+                      <input
+                        id="startTs"
+                        type="number"
+                        value={form.startTimestamp ?? ''}
+                        onChange={(e) => set('startTimestamp', e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder={String(Date.now())}
+                        className="px-3 py-2 rounded-lg bg-background border border-border text-sm font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="endTs" className="text-xs font-medium text-muted-foreground">End (Unix ms)</label>
+                      <input
+                        id="endTs"
+                        type="number"
+                        value={form.endTimestamp ?? ''}
+                        onChange={(e) => set('endTimestamp', e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder={String(Date.now() + 3600000)}
+                        className="px-3 py-2 rounded-lg bg-background border border-border text-sm font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Party */}
+              <div className="rounded-xl border border-border bg-card/30 p-4 space-y-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest flex items-center gap-1.5"><Users className="w-3 h-3" /> Party</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="partySize" className="text-xs font-medium text-muted-foreground">Size</label>
@@ -469,14 +610,6 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                     />
                   </div>
                 </div>
-              </div>
-              <div className="rounded-xl border border-border bg-card/30 px-4 py-2">
-                <Toggle
-                  label="Show Elapsed Time"
-                  description="Displays a running timer in your presence"
-                  checked={form.showElapsedTime}
-                  onChange={(v) => set('showElapsedTime', v)}
-                />
               </div>
             </div>
           )}

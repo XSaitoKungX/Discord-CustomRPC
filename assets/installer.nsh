@@ -18,27 +18,20 @@
   System::Call 'kernel32::CreateMutexW(i 0, i 1, w "DiscordCustomRPCManager_Running") i .r0 ?e'
   Pop $1
   IntCmp $1 183 0 notRunning notRunning
-    ; App is running — show nsDialogs warning page instead of plain MessageBox
-    nsDialogs::Create 1018
-    Pop $2
-    ${NSD_CreateLabel} 0 0 100% 40u "Discord Custom RPC Manager is currently running.$\r$\nPlease close it before continuing with the installation."
-    Pop $3
-    ${NSD_CreateBitmap} 0 45u 164u 57u ""
-    Pop $4
-    ${NSD_SetImage} $4 "${__FILEDIR__}\installer-banner.bmp" $5
-    nsDialogs::Show
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Discord Custom RPC Manager is currently running.$\r$\nPlease close it before continuing with the installation."
     Quit
   notRunning:
 
   ; ── Already-installed check ────────────────────────────────────────────────
-  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_ID}" "DisplayVersion"
+  ; electron-builder registers the uninstall key under the appId
+  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\dev.xsaitox.discord-custom-rpc" "DisplayVersion"
   StrCmp $0 "" initDone
 
   MessageBox MB_YESNOCANCEL|MB_ICONQUESTION "Discord Custom RPC Manager v$0 is already installed.$\r$\n$\r$\nYES    =  Reinstall / update (keeps your profiles)$\r$\nNO     =  Uninstall first, then install fresh$\r$\nCANCEL =  Abort" IDYES initDone IDNO doUninstall
   Quit
 
   doUninstall:
-    ReadRegStr $1 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_ID}" "UninstallString"
+    ReadRegStr $1 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\dev.xsaitox.discord-custom-rpc" "UninstallString"
     StrCmp $1 "" initDone
     ExecWait '"$1" /S'
 

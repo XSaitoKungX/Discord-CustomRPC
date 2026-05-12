@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ImageIcon, AlertCircle } from 'lucide-react'
 import type { RPCProfile } from '../../types/profile'
+import { ActivityType, TimestampMode } from '../../types/profile'
 
 interface AssetEntry { id: string; name: string }
 
@@ -35,44 +36,73 @@ function ImageErrorPlaceholder(): React.ReactElement {
   )
 }
 
+const ACTIVITY_HEADER: Record<ActivityType, string> = {
+  [ActivityType.PLAYING]: 'Playing a game',
+  [ActivityType.STREAMING]: 'Live on stream',
+  [ActivityType.LISTENING]: 'Listening to',
+  [ActivityType.WATCHING]: 'Watching',
+  [ActivityType.COMPETING]: 'Competing in'
+}
+
+function formatDuration(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000))
+  const h = Math.floor(total / 3600)
+  const m = Math.floor((total % 3600) / 60)
+  const s = total % 60
+  if (h > 0) {
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+
 export function RPCPreview({ profile, assets }: RPCPreviewProps): React.ReactElement {
-  const [elapsed, setElapsed] = useState<string>('00:00')
-  const [startTime] = useState(() => new Date())
+  const [now, setNow] = useState(() => Date.now())
+  const [connectedAt] = useState(() => Date.now())
   const [largeError, setLargeError] = useState(false)
   const [smallError, setSmallError] = useState(false)
 
-  // Reset errors when profile changes
   useEffect(() => {
     setLargeError(false)
     setSmallError(false)
   }, [profile.largeImageKey, profile.smallImageKey, profile.applicationId])
 
+  const tsMode = profile.timestampMode ?? TimestampMode.NONE
+  const showsTime = tsMode !== TimestampMode.NONE || profile.showElapsedTime
+
   useEffect(() => {
-    if (!profile.showElapsedTime) return
-    const interval = setInterval(() => {
-      const diff = Math.floor((Date.now() - startTime.getTime()) / 1000)
-      const h = Math.floor(diff / 3600)
-      const m = Math.floor((diff % 3600) / 60)
-      const s = diff % 60
-      if (h > 0) {
-        setElapsed(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`)
-      } else {
-        setElapsed(`${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`)
-      }
-    }, 1000)
+    if (!showsTime) return
+    const interval = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(interval)
-  }, [profile.showElapsedTime, startTime])
+  }, [showsTime])
+
+  const activityType = profile.activityType ?? ActivityType.PLAYING
+  const headerLabel = ACTIVITY_HEADER[activityType] ?? 'Playing a game'
+
+  let timestampLine: string | null = null
+  if (tsMode === TimestampMode.NOW || (tsMode === TimestampMode.NONE && profile.showElapsedTime)) {
+    timestampLine = `${formatDuration(now - connectedAt)} elapsed`
+  } else if (tsMode === TimestampMode.LOCAL_TIME) {
+    const midnight = new Date()
+    midnight.setHours(0, 0, 0, 0)
+    timestampLine = `${formatDuration(now - midnight.getTime())} elapsed`
+  } else if (tsMode === TimestampMode.CUSTOM) {
+    if (profile.endTimestamp) {
+      const remaining = profile.endTimestamp - now
+      timestampLine = remaining > 0 ? `${formatDuration(remaining)} left` : '00:00 left'
+    } else if (profile.startTimestamp) {
+      timestampLine = `${formatDuration(now - profile.startTimestamp)} elapsed`
+    }
+  }
 
   const largeUrl = getAssetUrl(profile.applicationId, profile.largeImageKey, assets)
   const smallUrl = getAssetUrl(profile.applicationId, profile.smallImageKey, assets)
 
   return (
-    // Always dark preview regardless of app theme
     <div className="rounded-xl overflow-hidden" style={{ background: '#1e1f22', fontFamily: 'Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif' }}>
       {/* Discord-style header */}
       <div className="px-3 pt-3 pb-2">
         <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: '#b5bac1' }}>
-          Playing a game
+          {headerLabel}
         </p>
       </div>
 
@@ -136,9 +166,9 @@ export function RPCPreview({ profile, assets }: RPCPreviewProps): React.ReactEle
               {profile.state}
             </p>
           )}
-          {profile.showElapsedTime && (
+          {timestampLine && (
             <p className="text-[12px]" style={{ color: '#b5bac1' }}>
-              {elapsed} elapsed
+              {timestampLine}
             </p>
           )}
         </div>
