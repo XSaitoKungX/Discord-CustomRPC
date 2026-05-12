@@ -58,7 +58,7 @@ jobs:
         run: bun run prepare:native
 
       - name: Package Windows
-        run: electron-builder --win --publish never
+        run: bunx electron-builder --win --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -125,7 +125,7 @@ jobs:
         run: bun run prepare:native
 
       - name: Package Linux
-        run: electron-builder --linux deb AppImage rpm --publish never
+        run: bunx electron-builder --linux deb AppImage rpm --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -189,7 +189,7 @@ jobs:
         run: bun run prepare:native
 
       - name: Package macOS
-        run: electron-builder --mac --publish never
+        run: bunx electron-builder --mac --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
