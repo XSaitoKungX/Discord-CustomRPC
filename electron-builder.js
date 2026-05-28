@@ -78,13 +78,12 @@ const config = {
   // ─── Windows ───────────────────────────────────────────────────
   win: {
     target: [
-      { target: 'nsis', arch: ['x64', 'arm64'] },
-      { target: 'portable', arch: ['x64'] }
+      { target: 'nsis', arch: ['x64', 'arm64'] }
     ],
     icon: 'assets/icon.ico',
     requestedExecutionLevel: 'asInvoker',
     verifyUpdateCodeSignature: false,
-    artifactName: '${productName}-${version}-${arch}.${ext}'
+    artifactName: '${productName}-Setup-${version}-${arch}.${ext}'
   },
 
   nsis: {
@@ -92,8 +91,9 @@ const config = {
     allowToChangeInstallationDirectory: true,
     allowElevation: true,
     perMachine: false,
-    artifactName: '${productName} Setup ${version}.${ext}',
-    uninstallDisplayName: '${productName}',
+    guid: 'dev.xsaitox.discord-custom-rpc',
+    artifactName: '${productName}-Setup-${version}.${ext}',
+    uninstallDisplayName: '${productName} ${version}',
     include: 'assets/installer.nsh',
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
@@ -104,7 +104,9 @@ const config = {
     installerHeaderIcon: 'assets/icon.ico',
     license: 'LICENSE',
     runAfterFinish: true,
-    deleteAppDataOnUninstall: false
+    deleteAppDataOnUninstall: false,
+    installerLanguages: ['en_US'],
+    language: '1033'
   },
 
   // ─── Linux ─────────────────────────────────────────────────────

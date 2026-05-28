@@ -58,46 +58,20 @@
   !insertmacro MUI_UNPAGE_WELCOME
 !macroend
 
-; ── UNINSTALLER: DATA CLEANUP PAGE ───────────────────────────────────────────
+; ── UNINSTALLER: DATA CLEANUP ────────────────────────────────────────────────
 !macro customUnInstall
-  ; Custom nsDialogs page — checkbox instead of plain MessageBox
-  nsDialogs::Create 1018
-  Pop $0
-  StrCmp $0 error uninstallFallback
+  MessageBox MB_YESNO|MB_ICONQUESTION \
+    "Do you also want to delete your saved profiles and settings?$\r$\n$\r$\nYES  →  Permanently delete all profiles and app data$\r$\nNO   →  Keep data (reinstalling will restore your profiles)" \
+    IDYES deleteAppData IDNO skipAppData
 
-  ${NSD_CreateLabel} 0 0 100% 30u "The uninstallation is complete."
-  Pop $1
-
-  ${NSD_CreateLabel} 0 35u 100% 20u "Would you also like to remove your saved profiles and app data?"
-  Pop $1
-
-  ${NSD_CreateCheckbox} 0 60u 100% 12u "Delete my profiles and settings permanently"
-  Pop $2
-  ${NSD_SetState} $2 ${BST_UNCHECKED}
-
-  ${NSD_CreateLabel} 0 78u 100% 30u "Leave unchecked to keep your data — reinstalling will restore all your profiles."
-  Pop $1
-
-  nsDialogs::Show
-
-  ${NSD_GetState} $2 $3
-  StrCmp $3 ${BST_CHECKED} deleteData skipDelete
-
-  deleteData:
+  deleteAppData:
     SetShellVarContext current
     DetailPrint "Removing user app data..."
     RMDir /r "$APPDATA\discord-custom-rpc"
     RMDir /r "$LOCALAPPDATA\discord-custom-rpc"
     RMDir /r "$LOCALAPPDATA\Discord Custom RPC Manager"
     DetailPrint "App data removed."
-    Goto uninstallDone
 
-  uninstallFallback:
-    ; nsDialogs not available — fall back to MessageBox
-    MessageBox MB_YESNO|MB_ICONQUESTION "Do you also want to delete your saved profiles and settings?$\r$\n$\r$\nYES ->  Permanently delete all profiles and app data$\r$\nNO  ->  Keep data (reinstalling will restore your profiles)" IDYES deleteData IDNO skipDelete
-
-  skipDelete:
+  skipAppData:
     DetailPrint "App data kept."
-
-  uninstallDone:
 !macroend
