@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0-beta.1] - 2026-05-12
+## [2.0.0-beta.1] - 2026-05-28
 
 ### Bug Fixes
 
@@ -15,10 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use bunx for all electron-builder/electron-vite/rebuild calls — fixes exit 127 in GitHub Actions (ci)
 
+- Remove portable target, fix NSIS uninstall macro, add guid (installer)
+
 
 ### Features
 
 - V2.0.0-beta.1 — activity types, timestamps, URLs, smart migrations, onboarding redesign 
+
+
+### Miscellaneous Tasks
+
+- Update CHANGELOG.md for v2.0.0-beta.1 (release)
 
 
 ## [1.0.1-beta.3] - 2026-04-15
