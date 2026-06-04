@@ -7,28 +7,29 @@ import {
   reorderProfiles
 } from '../../db/queries/profiles'
 import type { RPCProfile } from '../types'
+import { IPC } from '../../shared/ipcChannels'
 
 export function registerProfileHandlers(): void {
-  ipcMain.handle('profiles:getAll', async () => {
+  ipcMain.handle(IPC.PROFILES_GET_ALL, async () => {
     return getAllProfiles()
   })
 
   ipcMain.handle(
-    'profiles:create',
+    IPC.PROFILES_CREATE,
     async (_event, data: Omit<RPCProfile, 'id' | 'createdAt' | 'updatedAt'>) => {
       return createProfile(data)
     }
   )
 
-  ipcMain.handle('profiles:update', async (_event, id: string, data: Partial<RPCProfile>) => {
+  ipcMain.handle(IPC.PROFILES_UPDATE, async (_event, id: string, data: Partial<RPCProfile>) => {
     return updateProfile(id, data)
   })
 
-  ipcMain.handle('profiles:delete', async (_event, id: string) => {
+  ipcMain.handle(IPC.PROFILES_DELETE, async (_event, id: string) => {
     return deleteProfile(id)
   })
 
-  ipcMain.handle('profiles:reorder', async (_event, orderedIds: string[]) => {
+  ipcMain.handle(IPC.PROFILES_REORDER, async (_event, orderedIds: string[]) => {
     return reorderProfiles(orderedIds)
   })
 }

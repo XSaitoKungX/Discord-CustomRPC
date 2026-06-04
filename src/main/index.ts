@@ -3,11 +3,12 @@ import { join } from 'path'
 import { optimizer, is } from '@electron-toolkit/utils'
 import { initDatabase } from '../db/index'
 import { registerProfileHandlers } from './ipc/profiles'
-import { registerRpcHandlers, registerDiscordApiHandlers } from './ipc/rpc'
+import { registerRpcHandlers, registerDiscordApiHandlers, autoStartRPC } from './ipc/rpc'
 import { initSettingsStore, registerSettingsHandlers, getSettings } from './ipc/settings'
 import { createTray, updateTrayMenu, destroyTray } from './tray'
 import { setupUpdater } from './updater'
 import { registerDeepLinkProtocol, handleDeepLink } from './deeplink'
+import { IPC } from '../shared/ipcChannels'
 
 // Must be set before app is ready for Windows taskbar icon to work correctly
 if (process.platform === 'win32') {
@@ -84,13 +85,13 @@ function createWindow(): void {
 
 function registerShortcuts(): void {
   globalShortcut.register('CommandOrControl+N', () => {
-    mainWindow?.webContents.send('shortcut:newProfile')
+    mainWindow?.webContents.send(IPC.SHORTCUT_NEW_PROFILE)
   })
   globalShortcut.register('CommandOrControl+S', () => {
-    mainWindow?.webContents.send('shortcut:save')
+    mainWindow?.webContents.send(IPC.SHORTCUT_SAVE)
   })
   globalShortcut.register('CommandOrControl+,', () => {
-    mainWindow?.webContents.send('shortcut:settings')
+    mainWindow?.webContents.send(IPC.SHORTCUT_SETTINGS)
   })
   globalShortcut.register('CommandOrControl+W', () => {
     const settings = getSettings()
@@ -149,7 +150,7 @@ app.whenReady().then(async () => {
   registerDiscordApiHandlers()
 
   // App version IPC
-  ipcMain.handle('app:version', () => app.getVersion())
+  ipcMain.handle(IPC.APP_VERSION, () => app.getVersion())
 
   // Register deep link protocol
   registerDeepLinkProtocol()
@@ -163,7 +164,8 @@ app.whenReady().then(async () => {
 
     // Listen for RPC status changes to update tray
     mainWindow.webContents.on('did-finish-load', () => {
-      mainWindow?.webContents.send('app:ready')
+      mainWindow?.webContents.send(IPC.APP_READY)
+      void autoStartRPC(getMainWindow)
     })
 
     // Update tray periodically

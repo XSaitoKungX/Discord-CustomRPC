@@ -1,5 +1,6 @@
 import { ipcMain, app } from 'electron'
 import type { AppSettings } from '../types'
+import { IPC } from '../../shared/ipcChannels'
 
 // electron-store v11 is ESM-only; use a type-only import for the class shape
 type ElectronStore<T extends Record<string, unknown>> = {
@@ -13,7 +14,8 @@ const defaultSettings: AppSettings = {
   startMinimized: false,
   autostart: false,
   updateChannel: 'stable',
-  showOnboarding: true
+  showOnboarding: true,
+  lastActiveProfileId: null
 }
 
 let store: ElectronStore<AppSettings> | null = null
@@ -32,7 +34,7 @@ function getStore(): ElectronStore<AppSettings> {
 }
 
 export function registerSettingsHandlers(): void {
-  ipcMain.handle('settings:get', (): AppSettings => {
+  ipcMain.handle(IPC.SETTINGS_GET, (): AppSettings => {
     const s = getStore()
     return {
       theme: s.get('theme', defaultSettings.theme),
@@ -40,12 +42,13 @@ export function registerSettingsHandlers(): void {
       startMinimized: s.get('startMinimized', defaultSettings.startMinimized),
       autostart: s.get('autostart', defaultSettings.autostart),
       updateChannel: s.get('updateChannel', defaultSettings.updateChannel),
-      showOnboarding: s.get('showOnboarding', defaultSettings.showOnboarding)
+      showOnboarding: s.get('showOnboarding', defaultSettings.showOnboarding),
+      lastActiveProfileId: s.get('lastActiveProfileId', defaultSettings.lastActiveProfileId)
     }
   })
 
   ipcMain.handle(
-    'settings:set',
+    IPC.SETTINGS_SET,
     (_event, key: keyof AppSettings, value: AppSettings[keyof AppSettings]) => {
       const s = getStore()
       s.set(key, value)
@@ -69,6 +72,15 @@ export function getSettings(): AppSettings {
     startMinimized: s.get('startMinimized', defaultSettings.startMinimized),
     autostart: s.get('autostart', defaultSettings.autostart),
     updateChannel: s.get('updateChannel', defaultSettings.updateChannel),
-    showOnboarding: s.get('showOnboarding', defaultSettings.showOnboarding)
+    showOnboarding: s.get('showOnboarding', defaultSettings.showOnboarding),
+    lastActiveProfileId: s.get('lastActiveProfileId', defaultSettings.lastActiveProfileId)
+  }
+}
+
+export function saveLastActiveProfileId(id: string | null): void {
+  try {
+    getStore().set('lastActiveProfileId', id)
+  } catch {
+    // Store not ready — ignore
   }
 }

@@ -52,6 +52,7 @@ export interface AppSettings extends Record<string, unknown> {
   autostart: boolean
   updateChannel: 'stable' | 'beta'
   showOnboarding: boolean
+  lastActiveProfileId: string | null
 }
 
 export type RPCStatus = 'connected' | 'disconnected' | 'error'

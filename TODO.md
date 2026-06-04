@@ -1,7 +1,7 @@
 # TODO
 
 Roadmap and task tracker for **Discord Custom RPC Manager**. Items are derived
-from a review of the current source (`2.0.0-beta.1`). Check items off as they
+from a review of the current source (`2.0.0`). Check items off as they
 land. Severity hints: **[bug]**, **[incomplete]**, **[enhancement]**,
 **[feature]**, **[release]**.
 
@@ -69,7 +69,7 @@ land. Severity hints: **[bug]**, **[incomplete]**, **[enhancement]**,
 - [x] **[enhancement] Surface a clear "Discord not running" state.** Connection
   errors are silently retried in `rpc.ts`; add a user-visible hint when Discord
   is closed.
-- [ ] **[enhancement] Centralize IPC channel names** in a shared constants file
+- [x] **[enhancement] Centralize IPC channel names** in a shared constants file
   to avoid string drift between `main/ipc/*`, `preload/index.ts`, and `env.d.ts`.
 - [x] **[enhancement] Add input validation in the editor.** Application ID
   (numeric), button URLs (valid `http(s)`), button label length limits, and the
@@ -101,9 +101,9 @@ land. Severity hints: **[bug]**, **[incomplete]**, **[enhancement]**,
 
 - [ ] **[feature] Profile scheduling / rotation** — auto-switch profiles on a
   timer or schedule.
-- [ ] **[feature] Auto-start last active profile** on app launch.
+- [x] **[feature] Auto-start last active profile** on app launch.
 - [ ] **[feature] Profile templates / presets** for common games and apps.
-- [ ] **[feature] Profile duplication & folders/tags** for organization.
+- [x] **[feature] Profile duplication & folders/tags** for organization.
 - [ ] **[feature] Multiple locales** (German first, given the author/site).
 - [ ] **[feature] Global hotkeys** to toggle a profile on/off.
 - [ ] **[feature] Per-profile keyboard shortcut / quick-switcher.**
@@ -136,20 +136,20 @@ Currently `assets/installer.nsh` uses `installer-banner.bmp`
 
 ## 6. Prepare the full (non-beta) `2.0.0` release
 
-- [ ] **Bump version** in `package.json` from `2.0.0-beta.1` to `2.0.0`.
+- [x] **Bump version** in `package.json` from `2.0.0-beta.1` to `2.0.0`.
 - [ ] **Switch the updater to stable.** In `src/main/updater.ts` set
   `allowPrerelease`/`channel` from the user setting; default new installs to
   `stable`. Default `defaultSettings.updateChannel` is already `'stable'`.
-- [ ] **Change publish from draft to release.** `electron-builder.js`
+- [x] **Change publish from draft to release.** `electron-builder.js`
   `publish.releaseType` is `'draft'`; decide final release flow (and review
   `release:*` scripts that publish always).
 - [ ] **Resolve all section 1 bugs and section 2 incompletes** that are
   user-facing before tagging stable.
-- [ ] **Run quality gates:** `bun run typecheck` and `bun run lint` must pass.
+- [x] **Run quality gates:** `bun run typecheck` and `bun run lint` must pass.
 - [ ] **Smoke-test packaged builds** on Windows, Linux (deb/AppImage/rpm), and
   macOS, including: install/uninstall, tray, deep-link import, auto-update,
   RPC activate/deactivate, all 7 themes.
-- [ ] **Update docs:** `README.md` (remove beta wording, fix protocol),
+- [x] **Update docs:** `README.md` (remove beta wording, fix protocol),
   `CHANGELOG.md` (cut a `2.0.0` section via `git-cliff`).
 - [ ] **Consider code signing** (Windows + macOS) to remove SmartScreen/
   Gatekeeper warnings, or keep the documented manual-run steps.

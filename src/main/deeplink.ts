@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron'
+import { IPC } from '../shared/ipcChannels'
 
 const PROTOCOL = 'discordrpc'
 
@@ -28,7 +29,7 @@ export function handleDeepLink(url: string, mainWindow: BrowserWindow | null): v
     mainWindow.focus()
 
     if (action === 'import' && data) {
-      mainWindow.webContents.send('deeplink:import', data)
+      mainWindow.webContents.send(IPC.DEEPLINK_IMPORT, data)
     }
   } catch {
     // Ignore invalid URLs

@@ -1,6 +1,7 @@
 import { Tray, Menu, app, nativeImage, BrowserWindow } from 'electron'
 import path from 'path'
 import { getActiveProfile, getRpcStatus, stopRpc } from './ipc/rpc'
+import { IPC } from '../shared/ipcChannels'
 
 let tray: Tray | null = null
 
@@ -74,7 +75,7 @@ export function updateTrayMenu(mainWindow: BrowserWindow): void {
       enabled: isActive,
       click: async () => {
         await stopRpc()
-        mainWindow.webContents.send('rpc:statusChanged', 'disconnected')
+        mainWindow.webContents.send(IPC.RPC_STATUS_CHANGED, 'disconnected')
         updateTrayMenu(mainWindow)
       }
     },

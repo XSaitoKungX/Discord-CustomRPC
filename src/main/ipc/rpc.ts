@@ -2,6 +2,9 @@ import { ipcMain, BrowserWindow } from 'electron'
 import DiscordRPC from 'discord-rpc'
 import type { RPCProfile, RPCStatus, RPCStartResult } from '../types'
 import { ActivityType, TimestampMode } from '../types'
+import { IPC } from '../../shared/ipcChannels'
+import { saveLastActiveProfileId, getSettings } from './settings'
+import { getAllProfiles } from '../../db/queries/profiles'
 
 let client: DiscordRPC.Client | null = null
 let currentStatus: RPCStatus = 'disconnected'
@@ -11,7 +14,7 @@ let activeProfile: RPCProfile | null = null
 
 function broadcastStatus(win: BrowserWindow | null, status: RPCStatus): void {
   currentStatus = status
-  win?.webContents.send('rpc:statusChanged', status)
+  win?.webContents.send(IPC.RPC_STATUS_CHANGED, status)
 }
 
 async function connectRPC(profile: RPCProfile, win: BrowserWindow | null): Promise<RPCStartResult> {
@@ -144,19 +147,22 @@ function scheduleReconnect(profile: RPCProfile, win: BrowserWindow | null): void
 }
 
 export function registerRpcHandlers(getMainWindow: () => BrowserWindow | null): void {
-  ipcMain.handle('rpc:start', async (_event, profile: RPCProfile): Promise<RPCStartResult> => {
+  ipcMain.handle(IPC.RPC_START, async (_event, profile: RPCProfile): Promise<RPCStartResult> => {
     startTimestamp = null
     activeProfile = profile
-    return connectRPC(profile, getMainWindow())
+    const result = await connectRPC(profile, getMainWindow())
+    if (result.success) saveLastActiveProfileId(profile.id)
+    return result
   })
 
-  ipcMain.handle('rpc:stop', async () => {
+  ipcMain.handle(IPC.RPC_STOP, async () => {
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
       reconnectTimer = null
     }
     activeProfile = null
     startTimestamp = null
+    saveLastActiveProfileId(null)
     if (client) {
       await client.clearActivity()
       await client.destroy()
@@ -165,15 +171,32 @@ export function registerRpcHandlers(getMainWindow: () => BrowserWindow | null): 
     broadcastStatus(getMainWindow(), 'disconnected')
   })
 
-  ipcMain.handle('rpc:status', () => currentStatus)
+  ipcMain.handle(IPC.RPC_STATUS, () => currentStatus)
 }
 
 export function getActiveProfile(): RPCProfile | null {
   return activeProfile
 }
 
+export async function autoStartRPC(getWin: () => BrowserWindow | null): Promise<void> {
+  const lastId = getSettings().lastActiveProfileId
+  if (!lastId) return
+  const profiles = await getAllProfiles()
+  const profile = profiles.find((p) => p.id === lastId)
+  if (!profile) {
+    saveLastActiveProfileId(null)
+    return
+  }
+  activeProfile = profile
+  const win = getWin()
+  const result = await connectRPC(profile, win)
+  if (result.success) {
+    win?.webContents.send(IPC.RPC_AUTO_STARTED, profile.id)
+  }
+}
+
 export function registerDiscordApiHandlers(): void {
-  ipcMain.handle('discord:getAssets', async (_event, appId: string) => {
+  ipcMain.handle(IPC.DISCORD_GET_ASSETS, async (_event, appId: string) => {
     if (!appId || !/^\d+$/.test(appId)) return []
     try {
       const res = await fetch(

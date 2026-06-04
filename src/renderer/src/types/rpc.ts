@@ -30,4 +30,5 @@ export interface AppSettings {
   autostart: boolean
   updateChannel: 'stable' | 'beta'
   showOnboarding: boolean
+  lastActiveProfileId: string | null
 }

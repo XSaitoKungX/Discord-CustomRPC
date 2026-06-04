@@ -19,6 +19,7 @@ declare global {
         onStatusChanged: (
           callback: (status: 'connected' | 'disconnected' | 'error') => void
         ) => () => void
+        onAutoStarted: (callback: (profileId: string) => void) => () => void
       }
       settings: {
         get: () => Promise<AppSettings>

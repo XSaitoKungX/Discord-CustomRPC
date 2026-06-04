@@ -95,6 +95,7 @@ export function SettingsPanel(): React.ReactElement {
     const defaults: AppSettings = {
       theme: 'default',
       minimizeToTray: true,
+      lastActiveProfileId: null,
       startMinimized: false,
       autostart: false,
       updateChannel: 'stable',

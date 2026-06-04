@@ -1,6 +1,6 @@
 {
   "name": "discord-custom-rpc",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "description": "A fully-featured Discord Custom RPC Manager — open source, free for everyone.",
   "main": "./out/main/index.js",
   "author": {
@@ -16,7 +16,7 @@
     "url": "https://github.com/XSaitoKungX/Discord-CustomRPC"
   },
   "scripts": {
-    "dev": "bunx @electron/rebuild -f -w better-sqlite3 && bunx electron-vite dev",
+    "dev": "bunx @electron/rebuild -f -w better-sqlite3 && bunx electron-vite dev -- --no-sandbox",
     "build": "bunx electron-vite build",
     "build:full": "bun run db:generate && bunx electron-vite build",
     "preview": "bunx electron-vite preview",

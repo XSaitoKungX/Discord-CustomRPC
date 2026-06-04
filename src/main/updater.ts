@@ -2,6 +2,7 @@ import { autoUpdater } from 'electron-updater'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import type { UpdateStatus } from './types'
 import { getSettings } from './ipc/settings'
+import { IPC } from '../shared/ipcChannels'
 
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000
 
@@ -49,7 +50,7 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
 
   autoUpdater.on('checking-for-update', () => {
     currentStatus = { checking: true, available: false, downloading: false, downloaded: false }
-    mainWindow.webContents.send('updater:status', currentStatus)
+    mainWindow.webContents.send(IPC.UPDATER_STATUS, currentStatus)
   })
 
   autoUpdater.on('update-available', (info) => {
@@ -60,12 +61,12 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
       downloaded: false,
       version: info.version
     }
-    mainWindow.webContents.send('updater:status', currentStatus)
+    mainWindow.webContents.send(IPC.UPDATER_STATUS, currentStatus)
   })
 
   autoUpdater.on('update-not-available', () => {
     currentStatus = { checking: false, available: false, downloading: false, downloaded: false }
-    mainWindow.webContents.send('updater:status', currentStatus)
+    mainWindow.webContents.send(IPC.UPDATER_STATUS, currentStatus)
   })
 
   autoUpdater.on('download-progress', (progressObj) => {
@@ -79,7 +80,7 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
         bytesPerSecond: progressObj.bytesPerSecond
       }
     }
-    mainWindow.webContents.send('updater:status', currentStatus)
+    mainWindow.webContents.send(IPC.UPDATER_STATUS, currentStatus)
   })
 
   autoUpdater.on('update-downloaded', (info) => {
@@ -90,7 +91,7 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
       downloaded: true,
       version: info.version
     }
-    mainWindow.webContents.send('updater:status', currentStatus)
+    mainWindow.webContents.send(IPC.UPDATER_STATUS, currentStatus)
   })
 
   autoUpdater.on('error', (err) => {
@@ -104,23 +105,23 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
       downloaded: false,
       error: isExpected ? undefined : msg
     }
-    mainWindow.webContents.send('updater:status', currentStatus)
+    mainWindow.webContents.send(IPC.UPDATER_STATUS, currentStatus)
   })
 
   // Register IPC handlers for updater
-  ipcMain.handle('updater:check', async () => {
+  ipcMain.handle(IPC.UPDATER_CHECK, async () => {
     await runCheck('manual')
   })
 
-  ipcMain.handle('updater:install', () => {
+  ipcMain.handle(IPC.UPDATER_INSTALL, () => {
     autoUpdater.quitAndInstall()
   })
 
-  ipcMain.handle('updater:download', async () => {
+  ipcMain.handle(IPC.UPDATER_DOWNLOAD, async () => {
     await autoUpdater.downloadUpdate()
   })
 
-  ipcMain.handle('updater:status', () => currentStatus)
+  ipcMain.handle(IPC.UPDATER_STATUS, () => currentStatus)
 
   // Auto-detect new versions: shortly after launch, then periodically
   setTimeout(() => {

@@ -16,7 +16,8 @@ const defaultSettings: AppSettings = {
   startMinimized: false,
   autostart: false,
   updateChannel: 'stable',
-  showOnboarding: true
+  showOnboarding: true,
+  lastActiveProfileId: null
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({

@@ -20,6 +20,15 @@ export function useRPC() {
     return unsubscribe
   }, [setStatus])
 
+  // Restore active profile state when auto-start connects on launch
+  useEffect(() => {
+    if (!isElectron()) return
+    const unsubscribe = window.api.rpc.onAutoStarted((profileId) => {
+      setActiveProfileId(profileId)
+    })
+    return unsubscribe
+  }, [setActiveProfileId])
+
   // Subscribe to updater status
   useEffect(() => {
     if (!isElectron()) return
