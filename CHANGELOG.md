@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-06-04
+
+### CI/CD
+
+- Add quality gates workflow, fix artifact patterns, remove draft releases, update deps 
+
+
+### Features
+
+- V2.0.0 — IPC centralization, auto-start, validation improvements 
+
+
+### Miscellaneous Tasks
+
+- Update CHANGELOG.md for v2.0.0-beta.1 (release)
+
+
 ## [2.0.0-beta.1] - 2026-05-28
 
 ### Bug Fixes
