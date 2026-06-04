@@ -6,8 +6,6 @@ import { ProfileShare } from '../components/profile/ProfileShare'
 import { useProfileStore } from '../store/profileStore'
 import type { RPCProfile } from '../types/profile'
 import { ArrowLeft } from 'lucide-react'
-import { decodeShareData } from '../lib/utils'
-import { isElectron } from '../lib/electron'
 
 type View = 'list' | 'new' | 'edit'
 
@@ -21,17 +19,6 @@ export function Profiles(): React.ReactElement {
   useEffect(() => {
     loadProfiles()
   }, [loadProfiles])
-
-  // Deep link import listener
-  useEffect(() => {
-    if (!isElectron()) return
-    const handleDeeplinkImport = (data: string): void => {
-      const profile = decodeShareData(data)
-      if (profile) importProfiles(JSON.stringify(profile))
-    }
-    const unsubscribe = window.api.deeplink.onImport(handleDeeplinkImport)
-    return unsubscribe
-  }, [importProfiles])
 
   // Settings panel import listener
   useEffect(() => {

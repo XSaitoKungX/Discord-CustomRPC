@@ -84,7 +84,7 @@ export function Welcome({ onClose }: WelcomeProps): React.ReactElement {
             onClick={handleDontShow}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-2 hover:underline"
           >
-            Don't show again
+            Don&apos;t show again
           </button>
 
           <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export function Welcome({ onClose }: WelcomeProps): React.ReactElement {
                 className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all"
               >
                 <Sparkles className="w-4 h-4" />
-                Let's go!
+                Let&apos;s go!
               </button>
             )}
           </div>

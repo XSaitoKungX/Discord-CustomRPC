@@ -72,7 +72,7 @@ const config = {
     provider: 'github',
     owner: 'XSaitoKungX',
     repo: 'Discord-CustomRPC',
-    releaseType: 'draft'
+    releaseType: 'release'
   },
 
   // ─── Windows ───────────────────────────────────────────────────

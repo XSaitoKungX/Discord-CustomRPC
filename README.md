@@ -23,7 +23,7 @@
 - **Live Preview** — See exactly how your presence will look in Discord before activating
 - **Auto-Complete Assets** — Automatically fetches your Discord app's Rich Presence assets with thumbnails
 - **System Tray** — Minimize to tray and run in the background
-- **Deep Link Support** — Import profiles via `dcrpc://` protocol
+- **Deep Link Support** — Import profiles via `discordrpc://` protocol
 - **Cross-Platform** — Available for Windows, macOS, and Linux
 - **Modern UI** — Clean, responsive interface with dark/light theme support
 

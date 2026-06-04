@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useProfileStore } from '../store/profileStore'
 import { isElectron } from '../lib/electron'
 import type { CreateProfileData, RPCProfile } from '../types/profile'
+import { ActivityType, TimestampMode } from '../types/profile'
 import toast from 'react-hot-toast'
 
 export function useProfiles() {
@@ -91,7 +92,7 @@ export function useProfiles() {
       try {
         if (!isElectron()) return
         await window.api.profiles.reorder(orderedIds)
-      } catch (err) {
+      } catch {
         toast.error('Failed to save order')
       }
     },
@@ -133,6 +134,8 @@ export function useProfiles() {
           const profile = await createProfile({
             name: p.name ?? 'Imported Profile',
             applicationId: p.applicationId ?? '',
+            activityType: p.activityType ?? ActivityType.PLAYING,
+            timestampMode: p.timestampMode ?? TimestampMode.NONE,
             details: p.details,
             state: p.state,
             largeImageKey: p.largeImageKey,

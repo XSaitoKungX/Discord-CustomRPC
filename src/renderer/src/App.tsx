@@ -13,6 +13,7 @@ import { useSettingsStore } from './store/settingsStore'
 import { useUiStore } from './store/uiStore'
 import { useProfiles } from './hooks/useProfiles'
 import { isElectron } from './lib/electron'
+import { decodeShareData } from './lib/utils'
 
 function AppShell(): React.ReactElement {
   useTheme()
@@ -30,12 +31,12 @@ function AppShell(): React.ReactElement {
   useEffect(() => {
     if (!isElectron()) return
     const unsubscribe = window.api.deeplink.onImport(async (data: string) => {
-      try {
-        const json = atob(data)
-        await importProfiles(json)
-      } catch {
+      const profile = decodeShareData(data)
+      if (!profile) {
         toast.error('Failed to import shared profile')
+        return
       }
+      await importProfiles(JSON.stringify(profile))
     })
     return unsubscribe
   }, [importProfiles])

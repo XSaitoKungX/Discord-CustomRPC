@@ -104,12 +104,11 @@ export async function deleteProfile(id: string): Promise<void> {
 
 export async function reorderProfiles(orderedIds: string[]): Promise<void> {
   const db = getDatabase()
-  for (let i = 0; i < orderedIds.length; i++) {
-    await db
-      .update(profiles)
-      .set({ sortOrder: i })
-      .where(eq(profiles.id, orderedIds[i]))
-  }
+  db.transaction((tx) => {
+    for (let i = 0; i < orderedIds.length; i++) {
+      tx.update(profiles).set({ sortOrder: i }).where(eq(profiles.id, orderedIds[i])).run()
+    }
+  })
 }
 
 function rowToProfile(row: typeof profiles.$inferSelect): RPCProfile {

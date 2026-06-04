@@ -9,7 +9,6 @@ type ElectronStore<T extends Record<string, unknown>> = {
 
 const defaultSettings: AppSettings = {
   theme: 'default',
-  language: 'en',
   minimizeToTray: true,
   startMinimized: false,
   autostart: false,
@@ -37,7 +36,6 @@ export function registerSettingsHandlers(): void {
     const s = getStore()
     return {
       theme: s.get('theme', defaultSettings.theme),
-      language: s.get('language', defaultSettings.language),
       minimizeToTray: s.get('minimizeToTray', defaultSettings.minimizeToTray),
       startMinimized: s.get('startMinimized', defaultSettings.startMinimized),
       autostart: s.get('autostart', defaultSettings.autostart),
@@ -67,7 +65,6 @@ export function getSettings(): AppSettings {
   const s = getStore()
   return {
     theme: s.get('theme', defaultSettings.theme),
-    language: s.get('language', defaultSettings.language),
     minimizeToTray: s.get('minimizeToTray', defaultSettings.minimizeToTray),
     startMinimized: s.get('startMinimized', defaultSettings.startMinimized),
     autostart: s.get('autostart', defaultSettings.autostart),

@@ -80,13 +80,15 @@ async function setActivity(profile: RPCProfile): Promise<void> {
   if (profile.details) activity.details = profile.details
   if (profile.state) activity.state = profile.state
 
-  // Images
-  if (profile.largeImageKey) {
-    activity.largeImageKey = profile.largeImageKey
+  // Images — prefer an explicit image URL over an asset key
+  const largeImage = profile.largeImageUrl || profile.largeImageKey
+  if (largeImage) {
+    activity.largeImageKey = largeImage
     if (profile.largeImageText) activity.largeImageText = profile.largeImageText
   }
-  if (profile.smallImageKey) {
-    activity.smallImageKey = profile.smallImageKey
+  const smallImage = profile.smallImageUrl || profile.smallImageKey
+  if (smallImage) {
+    activity.smallImageKey = smallImage
     if (profile.smallImageText) activity.smallImageText = profile.smallImageText
   }
 

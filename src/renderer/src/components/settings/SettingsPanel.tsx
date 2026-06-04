@@ -94,7 +94,6 @@ export function SettingsPanel(): React.ReactElement {
     if (!confirm('Reset all settings to defaults? This cannot be undone.')) return
     const defaults: AppSettings = {
       theme: 'default',
-      language: 'en',
       minimizeToTray: true,
       startMinimized: false,
       autostart: false,

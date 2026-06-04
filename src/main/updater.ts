@@ -1,6 +1,9 @@
 import { autoUpdater } from 'electron-updater'
-import { BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import type { UpdateStatus } from './types'
+import { getSettings } from './ipc/settings'
+
+const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000
 
 let currentStatus: UpdateStatus = {
   checking: false,
@@ -9,15 +12,40 @@ let currentStatus: UpdateStatus = {
   downloaded: false
 }
 
+function applyChannelFromSettings(): void {
+  let channel: 'stable' | 'beta' = 'stable'
+  try {
+    channel = getSettings().updateChannel
+  } catch {
+    // Settings store not ready yet — fall back to stable
+  }
+  if (channel === 'beta') {
+    autoUpdater.allowPrerelease = true
+    autoUpdater.channel = 'beta'
+  } else {
+    autoUpdater.allowPrerelease = false
+    autoUpdater.channel = 'latest'
+  }
+  console.log(
+    `[updater] Channel: ${autoUpdater.channel}, prerelease: ${autoUpdater.allowPrerelease}`
+  )
+}
+
+async function runCheck(reason: string): Promise<void> {
+  if (!app.isPackaged) return
+  applyChannelFromSettings()
+  try {
+    await autoUpdater.checkForUpdates()
+  } catch (err) {
+    console.warn(`[updater] ${reason} check failed:`, err instanceof Error ? err.message : err)
+  }
+}
+
 export function setupUpdater(mainWindow: BrowserWindow): void {
   autoUpdater.autoDownload = false
   autoUpdater.autoInstallOnAppQuit = true
 
-  // Always allow prerelease — so beta users get beta updates
-  // electron-updater compares semver, so beta.9 > beta.8 works correctly
-  autoUpdater.allowPrerelease = true
-  autoUpdater.channel = 'beta'
-  console.log('[updater] Channel: beta, prerelease: true')
+  applyChannelFromSettings()
 
   autoUpdater.on('checking-for-update', () => {
     currentStatus = { checking: true, available: false, downloading: false, downloaded: false }
@@ -80,14 +108,8 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
   })
 
   // Register IPC handlers for updater
-  const { ipcMain } = require('electron')
-
   ipcMain.handle('updater:check', async () => {
-    try {
-      await autoUpdater.checkForUpdates()
-    } catch (err) {
-      // Ignore errors in dev mode (no GitHub releases)
-    }
+    await runCheck('manual')
   })
 
   ipcMain.handle('updater:install', () => {
@@ -99,4 +121,12 @@ export function setupUpdater(mainWindow: BrowserWindow): void {
   })
 
   ipcMain.handle('updater:status', () => currentStatus)
+
+  // Auto-detect new versions: shortly after launch, then periodically
+  setTimeout(() => {
+    void runCheck('startup')
+  }, 10_000)
+  setInterval(() => {
+    void runCheck('interval')
+  }, CHECK_INTERVAL_MS)
 }

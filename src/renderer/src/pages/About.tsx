@@ -81,7 +81,7 @@ export function About(): React.ReactElement {
           </div>
           <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
             A free, open source desktop app to create and manage custom Discord Rich Presence profiles.
-            No token required — connects directly via Discord's local IPC protocol.
+            No token required — connects directly via Discord&apos;s local IPC protocol.
           </p>
         </div>
 

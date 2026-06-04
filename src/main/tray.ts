@@ -11,15 +11,6 @@ function getIconPath(_active: boolean): string {
   return path.join(__dirname, '../../assets', 'favicon-16x16.png')
 }
 
-function getAppIconPath(): string {
-  // Windows needs .ico file for proper icon display
-  const iconFile = process.platform === 'win32' ? 'icon.ico' : 'icon.png'
-  if (app.isPackaged) {
-    return path.join(process.resourcesPath, 'assets', iconFile)
-  }
-  return path.join(__dirname, '../../assets', iconFile)
-}
-
 export function createTray(mainWindow: BrowserWindow): Tray {
   let icon = nativeImage.createFromPath(getIconPath(false))
   

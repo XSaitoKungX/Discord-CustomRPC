@@ -159,7 +159,7 @@ app.whenReady().then(async () => {
 
   if (mainWindow) {
     // Setup tray
-    const tray = createTray(mainWindow)
+    createTray(mainWindow)
 
     // Listen for RPC status changes to update tray
     mainWindow.webContents.on('did-finish-load', () => {

@@ -102,7 +102,7 @@ export function ProfileList({
             {search ? (
               <>
                 <Search className="w-8 h-8 opacity-30" />
-                <p className="text-sm">No profiles match "{search}"</p>
+                <p className="text-sm">No profiles match &quot;{search}&quot;</p>
               </>
             ) : (
               <>

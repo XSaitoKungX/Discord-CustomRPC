@@ -69,7 +69,7 @@ jobs:
           path: |
             dist/*.exe
             dist/*.blockmap
-            dist/latest.yml
+            dist/*.yml
           if-no-files-found: warn
 
   build-linux:
@@ -138,7 +138,7 @@ jobs:
             dist/*.AppImage
             dist/*.rpm
             dist/*.blockmap
-            dist/latest-linux.yml
+            dist/*.yml
           if-no-files-found: warn
 
   build-mac:
@@ -202,7 +202,7 @@ jobs:
             dist/*.dmg
             dist/*.zip
             dist/*.blockmap
-            dist/latest-mac.yml
+            dist/*.yml
           if-no-files-found: warn
 
   release:
@@ -235,7 +235,6 @@ jobs:
             artifacts/* \
             --title "Release ${{ github.ref_name }}" \
             --notes-file RELEASE_NOTES.md \
-            --draft \
             --prerelease=${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -58,13 +58,8 @@ function formatDuration(ms: number): string {
 export function RPCPreview({ profile, assets }: RPCPreviewProps): React.ReactElement {
   const [now, setNow] = useState(() => Date.now())
   const [connectedAt] = useState(() => Date.now())
-  const [largeError, setLargeError] = useState(false)
-  const [smallError, setSmallError] = useState(false)
-
-  useEffect(() => {
-    setLargeError(false)
-    setSmallError(false)
-  }, [profile.largeImageKey, profile.smallImageKey, profile.applicationId])
+  const [erroredLarge, setErroredLarge] = useState<string | null>(null)
+  const [erroredSmall, setErroredSmall] = useState<string | null>(null)
 
   const tsMode = profile.timestampMode ?? TimestampMode.NONE
   const showsTime = tsMode !== TimestampMode.NONE || profile.showElapsedTime
@@ -94,8 +89,10 @@ export function RPCPreview({ profile, assets }: RPCPreviewProps): React.ReactEle
     }
   }
 
-  const largeUrl = getAssetUrl(profile.applicationId, profile.largeImageKey, assets)
-  const smallUrl = getAssetUrl(profile.applicationId, profile.smallImageKey, assets)
+  const largeUrl = profile.largeImageUrl || getAssetUrl(profile.applicationId, profile.largeImageKey, assets)
+  const smallUrl = profile.smallImageUrl || getAssetUrl(profile.applicationId, profile.smallImageKey, assets)
+  const largeError = largeUrl !== null && erroredLarge === largeUrl
+  const smallError = smallUrl !== null && erroredSmall === smallUrl
 
   return (
     <div className="rounded-xl overflow-hidden" style={{ background: '#1e1f22', fontFamily: 'Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif' }}>
@@ -123,7 +120,7 @@ export function RPCPreview({ profile, assets }: RPCPreviewProps): React.ReactEle
                 alt={profile.largeImageText || 'large image'}
                 className="w-full h-full object-cover"
                 crossOrigin="anonymous"
-                onError={() => setLargeError(true)}
+                onError={() => setErroredLarge(largeUrl)}
               />
             )}
           </div>
@@ -144,7 +141,7 @@ export function RPCPreview({ profile, assets }: RPCPreviewProps): React.ReactEle
                   alt={profile.smallImageText || 'small image'}
                   className="w-full h-full object-cover"
                   crossOrigin="anonymous"
-                  onError={() => setSmallError(true)}
+                  onError={() => setErroredSmall(smallUrl)}
                 />
               )}
             </div>

@@ -47,7 +47,6 @@ export type AppTheme = 'default' | 'dark' | 'light' | 'space' | 'anime' | 'kawai
 
 export interface AppSettings extends Record<string, unknown> {
   theme: AppTheme
-  language: 'en'
   minimizeToTray: boolean
   startMinimized: boolean
   autostart: boolean

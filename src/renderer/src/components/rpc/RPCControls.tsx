@@ -1,4 +1,5 @@
-import { Play, Square, Loader2, Clock } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Play, Square, Loader2, Clock, WifiOff } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useRPC } from '../../hooks/useRPC'
 import { RPCStatus } from './RPCStatus'
@@ -13,8 +14,25 @@ export function RPCControls({ profile, className }: RPCControlsProps): React.Rea
   const { status, activeProfileId, error, startRPC, stopRPC } = useRPC()
 
   const isThisActive = activeProfileId === profile.id
-  const isConnecting = status === 'connected' && activeProfileId !== profile.id
   const loading = false
+
+  const [cooldownSecs, setCooldownSecs] = useState(0)
+
+  useEffect(() => {
+    if (!isThisActive) return
+    // isThisActive is gated in the JSX, so no reset needed on cleanup
+    const startTime = Date.now()
+    const initial = setTimeout(() => setCooldownSecs(15), 0)
+    const timer = setInterval(() => {
+      const remaining = Math.max(0, 15 - Math.floor((Date.now() - startTime) / 1000))
+      setCooldownSecs(remaining)
+      if (remaining === 0) clearInterval(timer)
+    }, 1000)
+    return () => {
+      clearTimeout(initial)
+      clearInterval(timer)
+    }
+  }, [isThisActive])
 
   const handleToggle = async (): Promise<void> => {
     if (isThisActive) {
@@ -68,9 +86,19 @@ export function RPCControls({ profile, className }: RPCControlsProps): React.Rea
         </p>
       )}
 
+      {isThisActive && status === 'disconnected' && (
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <WifiOff className="w-3 h-3" />
+          Waiting for Discord… retrying automatically
+        </p>
+      )}
+
       <p className="text-xs text-muted-foreground flex items-center gap-1">
         <Clock className="w-3 h-3" />
-        Discord allows updates every 15 seconds minimum
+        {isThisActive && cooldownSecs > 0
+          ? `Discord cooldown — ${cooldownSecs}s remaining`
+          : 'Discord allows updates every 15 seconds minimum'
+        }
       </p>
     </div>
   )

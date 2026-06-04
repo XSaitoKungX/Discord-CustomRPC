@@ -99,29 +99,6 @@ function Field({ label, id, value, onChange, placeholder, required, hint, mono, 
   )
 }
 
-function Toggle({ label, description, checked, onChange }: { label: string; description?: string; checked: boolean; onChange: (v: boolean) => void }): React.ReactElement {
-  return (
-    <label className="flex items-center justify-between gap-4 cursor-pointer group py-2">
-      <div>
-        <p className="text-sm text-foreground">{label}</p>
-        {description && <p className="text-xs text-muted-foreground/70 mt-0.5">{description}</p>}
-      </div>
-      <div
-        onClick={() => onChange(!checked)}
-        className={cn(
-          'relative w-10 h-5 rounded-full transition-colors shrink-0',
-          checked ? 'bg-primary' : 'bg-muted'
-        )}
-      >
-        <div className={cn(
-          'absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform',
-          checked ? 'translate-x-5' : 'translate-x-0.5'
-        )} />
-      </div>
-    </label>
-  )
-}
-
 interface AssetEntry { id: string; name: string }
 
 function useDiscordAssets(appId: string): { assets: AssetEntry[]; loading: boolean } {
@@ -129,16 +106,23 @@ function useDiscordAssets(appId: string): { assets: AssetEntry[]; loading: boole
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!appId || !/^\d+$/.test(appId) || !isElectron()) { setAssets([]); return }
     let cancelled = false
-    setLoading(true)
-    window.api.discord.getAssets(appId).then((data) => {
-      if (!cancelled) setAssets(data)
-    }).catch(() => {
-      if (!cancelled) setAssets([])
-    }).finally(() => {
-      if (!cancelled) setLoading(false)
-    })
+    async function load(): Promise<void> {
+      if (!appId || !/^\d+$/.test(appId) || !isElectron()) {
+        setAssets([])
+        return
+      }
+      setLoading(true)
+      try {
+        const data = await window.api.discord.getAssets(appId)
+        if (!cancelled) setAssets(data)
+      } catch {
+        if (!cancelled) setAssets([])
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    void load()
     return () => { cancelled = true }
   }, [appId])
 
@@ -279,6 +263,10 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [tab, setTab] = useState<Tab>('basic')
+  const [tsPlaceholders] = useState(() => ({
+    start: String(Date.now()),
+    end: String(Date.now() + 3600000)
+  }))
   const { assets, loading: assetsLoading } = useDiscordAssets(form.applicationId)
 
   const set = useCallback((key: keyof CreateProfileData, value: string | boolean | number | undefined) => {
@@ -291,8 +279,33 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
     if (!form.name.trim()) errs.name = 'Profile name is required'
     if (!form.applicationId.trim()) errs.applicationId = 'Application ID is required'
     else if (!/^\d+$/.test(form.applicationId.trim())) errs.applicationId = 'Must be a numeric ID'
+
+    const b1label = form.button1Label?.trim() ?? ''
+    const b1url = form.button1Url?.trim() ?? ''
+    if (b1label.length > 32) errs.button1Label = 'Max 32 characters'
+    else if (b1label && !b1url) errs.button1Url = 'URL is required when label is set'
+    else if (!b1label && b1url) errs.button1Label = 'Label is required when URL is set'
+    if (b1url && !/^https?:\/\//.test(b1url)) errs.button1Url = 'Must start with http:// or https://'
+
+    const b2label = form.button2Label?.trim() ?? ''
+    const b2url = form.button2Url?.trim() ?? ''
+    if (b2label.length > 32) errs.button2Label = 'Max 32 characters'
+    else if (b2label && !b2url) errs.button2Url = 'URL is required when label is set'
+    else if (!b2label && b2url) errs.button2Label = 'Label is required when URL is set'
+    if (b2url && !/^https?:\/\//.test(b2url)) errs.button2Url = 'Must start with http:// or https://'
+
+    if (
+      form.partySize !== undefined &&
+      form.partyMax !== undefined &&
+      form.partySize > form.partyMax
+    ) {
+      errs.partySize = 'Size must not exceed Max'
+    }
+
     setErrors(errs)
     if (errs.name || errs.applicationId) setTab('basic')
+    else if (errs.button1Label || errs.button1Url || errs.button2Label || errs.button2Url) setTab('buttons')
+    else if (errs.partySize) setTab('extra')
     return Object.keys(errs).length === 0
   }
 
@@ -515,13 +528,13 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
             <div className="space-y-4">
               <div className="rounded-xl border border-border bg-card/30 p-4 space-y-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Button 1</p>
-                <Field label="Label" id="btn1label" value={form.button1Label ?? ''} onChange={(v) => set('button1Label', v)} placeholder="Visit Website" />
-                <Field label="URL" id="btn1url" value={form.button1Url ?? ''} onChange={(v) => set('button1Url', v)} placeholder="https://example.com" mono />
+                <Field label="Label" id="btn1label" value={form.button1Label ?? ''} onChange={(v) => set('button1Label', v)} placeholder="Visit Website" error={errors.button1Label} />
+                <Field label="URL" id="btn1url" value={form.button1Url ?? ''} onChange={(v) => set('button1Url', v)} placeholder="https://example.com" mono error={errors.button1Url} />
               </div>
               <div className="rounded-xl border border-border bg-card/30 p-4 space-y-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Button 2</p>
-                <Field label="Label" id="btn2label" value={form.button2Label ?? ''} onChange={(v) => set('button2Label', v)} placeholder="Join Server" />
-                <Field label="URL" id="btn2url" value={form.button2Url ?? ''} onChange={(v) => set('button2Url', v)} placeholder="https://discord.gg/invite" mono />
+                <Field label="Label" id="btn2label" value={form.button2Label ?? ''} onChange={(v) => set('button2Label', v)} placeholder="Join Server" error={errors.button2Label} />
+                <Field label="URL" id="btn2url" value={form.button2Url ?? ''} onChange={(v) => set('button2Url', v)} placeholder="https://discord.gg/invite" mono error={errors.button2Url} />
               </div>
             </div>
           )}
@@ -562,7 +575,7 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                         type="number"
                         value={form.startTimestamp ?? ''}
                         onChange={(e) => set('startTimestamp', e.target.value ? Number(e.target.value) : undefined)}
-                        placeholder={String(Date.now())}
+                        placeholder={tsPlaceholders.start}
                         className="px-3 py-2 rounded-lg bg-background border border-border text-sm font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
                       />
                     </div>
@@ -573,7 +586,7 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                         type="number"
                         value={form.endTimestamp ?? ''}
                         onChange={(e) => set('endTimestamp', e.target.value ? Number(e.target.value) : undefined)}
-                        placeholder={String(Date.now() + 3600000)}
+                        placeholder={tsPlaceholders.end}
                         className="px-3 py-2 rounded-lg bg-background border border-border text-sm font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
                       />
                     </div>
@@ -594,8 +607,12 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                       value={form.partySize ?? ''}
                       onChange={(e) => set('partySize', e.target.value ? Number(e.target.value) : undefined)}
                       placeholder="1"
-                      className="px-3 py-2 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                      className={cn(
+                        'px-3 py-2 rounded-lg bg-background border text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all',
+                        errors.partySize ? 'border-red-500/70 focus:ring-red-500/30' : 'border-border'
+                      )}
                     />
+                    {errors.partySize && <p className="text-xs text-red-400">{errors.partySize}</p>}
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="partyMax" className="text-xs font-medium text-muted-foreground">Max</label>

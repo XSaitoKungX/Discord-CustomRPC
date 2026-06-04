@@ -12,7 +12,6 @@ interface SettingsState {
 
 const defaultSettings: AppSettings = {
   theme: 'default',
-  language: 'en',
   minimizeToTray: true,
   startMinimized: false,
   autostart: false,
